@@ -424,6 +424,9 @@ class Tester < Test::Unit::TestCase
         # Test calc grain mass
         
         b = Brew.new( "My Brew" )
+        assert b.total_grain_mass? == 0
+
+        b = Brew.new( "My Brew" )
         g = Grain.new( "wheat", 10, "lbs" )
         g2 = Grain.new( "Barley", 2, "lbs" )
         b.add_grain(g)
@@ -434,7 +437,16 @@ class Tester < Test::Unit::TestCase
         assert b.lbs_grain_total == 12
         
         # Test calculation of mash water
-        
+       
+        b = Brew.new( "My Brew" )
+        assert b.calc_volume_mash == 0
+
+        b = Brew.new( "My Brew" )
+        g = Grain.new( "wheat", 10, "lbs" )
+        g2 = Grain.new( "Barley", 2, "lbs" )
+        b.add_grain(g)
+        b.add_grain(g2)
+
         b.calc_volume_mash!
         assert b.volume_mash.volume == 4.5
         assert b.calc_volume_mash == 4.5
@@ -454,7 +466,16 @@ class Tester < Test::Unit::TestCase
         b.ratio_mash = 1.5
         
         # Test calculation of mash loss
-        
+
+        b = Brew.new( "My Brew" )
+        assert b.calc_volume_mash_loss == 0
+
+        b = Brew.new( "My Brew" )
+        g = Grain.new( "wheat", 10, "lbs" )
+        g2 = Grain.new( "Barley", 2, "lbs" )
+        b.add_grain(g)
+        b.add_grain(g2)
+       
         b.calc_volume_mash_loss!
         assert b.volume_mash_loss.volume == 1.5
         assert b.calc_volume_mash_loss == 1.5
@@ -475,6 +496,15 @@ class Tester < Test::Unit::TestCase
         
         # Test calculation of boil off loss
         
+        b.min_boil_time = 0
+        assert b.calc_volume_boil_loss == 0
+
+        b = Brew.new( "My Brew" )
+        g = Grain.new( "wheat", 10, "lbs" )
+        g2 = Grain.new( "Barley", 2, "lbs" )
+        b.add_grain(g)
+        b.add_grain(g2)
+     
         b.min_boil_time = 60
         
         b.calc_volume_boil_loss!
@@ -498,6 +528,15 @@ class Tester < Test::Unit::TestCase
         b.calc_volume_boil_loss!
         
         # Test calculation of shrinkage loss
+
+        b = Brew.new( "My Brew" )
+        assert b.calc_volume_shrinkage_loss == 0
+
+        b = Brew.new( "My Brew" )
+        g = Grain.new( "wheat", 10, "lbs" )
+        g2 = Grain.new( "Barley", 2, "lbs" )
+        b.add_grain(g)
+        b.add_grain(g2) 
         
         b.volume_final.volume = 5
         b.volume_trub_loss.volume = 0.125
@@ -525,6 +564,15 @@ class Tester < Test::Unit::TestCase
         
         # Test calculation of preboil volume
         
+        b = Brew.new( "My Brew" )
+        assert b.calc_volume_preboil == 0
+
+        b = Brew.new( "My Brew" )
+        g = Grain.new( "wheat", 10, "lbs" )
+        g2 = Grain.new( "Barley", 2, "lbs" )
+        b.add_grain(g)
+        b.add_grain(g2)
+
         b.min_boil_time = 60
         b.volume_final.volume = 5
         b.volume_trub_loss.volume = 0.125
@@ -565,6 +613,16 @@ class Tester < Test::Unit::TestCase
         assert b.calc_volume_preboil == 7.194444444444445
         
         # Test calculation of the sparge water
+        
+        b = Brew.new( "My Brew" )
+        assert b.calc_volume_sparge == 0
+
+        b = Brew.new( "My Brew" )
+        g = Grain.new( "wheat", 10, "lbs" )
+        g2 = Grain.new( "Barley", 2, "lbs" )
+        b.add_grain(g)
+        b.add_grain(g2)
+
         b.min_boil_time = 60
         b.volume_final.volume = 5
         b.volume_trub_loss.volume = 0.125
@@ -616,6 +674,9 @@ class Tester < Test::Unit::TestCase
         # Test calculating original gravity
         
         b = Brew.new( "My Brew" )
+        assert b.calc_gravity_original == 1
+
+        b = Brew.new( "My Brew" )
         b.volume_final.volume = 5
         b.volume_trub_loss.volume = 0.125
         g = Grain.new( "wheat", 10, "lbs", 40, 70 )
@@ -654,6 +715,9 @@ class Tester < Test::Unit::TestCase
         assert b.calc_gravity_original == 1.0434095238095238
         
         # Test calculating final gravity
+
+        b = Brew.new( "My Brew" )
+        assert b.calc_gravity_final == 0.75
         
         b = Brew.new( "My Brew" )
         b.volume_final.volume = 5
@@ -700,7 +764,10 @@ class Tester < Test::Unit::TestCase
         assert b.calc_gravity_final == 1.0065114285714285
         
         # Test calculation of ABV
-        
+       
+        b = Brew.new( "My Brew" )
+        assert b.calc_percent_abv == nil
+
         b = Brew.new( "My Brew" )
         b.volume_final.volume = 5
         b.volume_trub_loss.volume = 0.25
@@ -734,9 +801,11 @@ class Tester < Test::Unit::TestCase
         assert b.percent_abv == 4.2807587649904795
         assert b.calc_percent_abv == 4.2807587649904795
         
-    end
-    
-    def test_ibu
+        # test calculation of IBU 
+
+        b = Brew.new( "My Brew" )
+        assert b.calc_ibu == 0
+
         b = Brew.new( "My Brew" )
         b.volume_final.volume = 5
         h = Hops.new( "warrior", 15.7, 4.5, 3 )

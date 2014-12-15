@@ -57,9 +57,9 @@ class Brew
         @yeast = Yeast.new("Yeast name")
         @lbs_grain_total = 0
         @volume_mash = Water.new
-        @ratio_mash = 1.5
+        @ratio_mash = 1.5 # qts/lbs
         @volume_mash_loss = Water.new
-        @ratio_mash_loss = 0.5
+        @ratio_mash_loss = 0.5 # qts/lbs
         @volume_mash_dead_loss = Water.new
         @volume_sparge = Water.new
         @volume_preboil = Water.new
@@ -98,10 +98,11 @@ class Brew
         @hops.delete_at(index)
     end
     
+    # returns total grain mass in lbs
     def total_grain_mass?
         lbs_of_grain = 0
         @grains.each do |grain|
-            lbs_of_grain += grain.mass
+            lbs_of_grain += grain.convert_to( "lbs" )
         end
         return lbs_of_grain
     end
@@ -208,8 +209,11 @@ class Brew
     end
     
     def calc_percent_abv
-        abw = ((@gravity_original - @gravity_final)*WEIGHT_ETHYL_ALCOHOL)/@gravity_final
-        abv = (abw / DENSITY_ETHYL_ALCOHOL) * 100.0
+        abv = nil
+        if( @gravity_final != 0)
+            abw = ((@gravity_original - @gravity_final)*WEIGHT_ETHYL_ALCOHOL)/@gravity_final
+            abv = (abw / DENSITY_ETHYL_ALCOHOL) * 100.0
+        end
     end
    
     def calc_mass_hops
