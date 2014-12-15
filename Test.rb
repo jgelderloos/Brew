@@ -97,17 +97,20 @@ class Tester < Test::Unit::TestCase
         # Test unit conversion
         
         h = Hops.new( "chinook", 5.6, 10, 1, "oz" )
-        h.convert_to( "G" )
+        assert h.convert_to( "G" ) ==  28.34949254408346
+        h.convert_to!( "G" )
         assert h.unit == "g"
         assert h.mass == 28.34949254408346
         
         h = Hops.new( "chinook", 5.6, 10, 40, "g" )
-        h.convert_to( "oz" )
+        assert h.convert_to( "oz" ) ==  1.41096
+        h.convert_to!( "oz" )
         assert h.unit == "oz"
         assert h.mass == 1.41096
         
         # No change
-        h.convert_to( "test" )
+        assert h.convert_to( "test" ) == nil
+        h.convert_to!( "test" )
         assert h.unit == "oz"
         assert h.mass == 1.41096
     end
@@ -710,6 +713,23 @@ class Tester < Test::Unit::TestCase
         
     end
     
+    def test_ibu
+        b = Brew.new( "My Brew" )
+        b.volume_final.volume = 5
+        h = Hops.new( "warrior", 15.7, 4.5, 3 )
+        h2 = Hops.new( "Amarillo", 8.2, 6.2, 2 )
+        h3 = Hops.new( "Simcoe", 12.3, 3.7, 2 )
+        b.add_hops(h)
+        b.add_hops(h2)
+        b.add_hops(h3)
+        
+        mass = b.calc_mass_hops
+        assert mass = 7
+
+        ibu = b.calc_ibu
+        assert ibu == 56.565008025682175
+    end
+
     def test_file_manager
         b = Brew.new( "Wheat Beer" )
         b.volume_final = Water.new( 5, "gal" )

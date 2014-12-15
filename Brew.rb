@@ -191,5 +191,21 @@ class Brew
         abw = ((@gravity_original - @gravity_final)*WEIGHT_ETHYL_ALCOHOL)/@gravity_final
         abv = (abw / DENSITY_ETHYL_ALCOHOL) * 100.0
     end
-    
+   
+    def calc_mass_hops
+        mass = 0
+        @hops.each do |hop|
+            mass = mass + hop.convert_to( "oz" )
+        end
+        return mass
+    end
+
+    def calc_ibu
+        ibu = 0
+        @hops.each do |hop|
+            ibu += ( (hop.alpha * 0.3 / 0.01335 / @volume_final.volume ) * (hop.convert_to("oz").to_f / calc_mass_hops().to_f ) ) 
+        end
+        return ibu
+    end
+
 end

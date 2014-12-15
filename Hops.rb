@@ -5,10 +5,10 @@ class Hops
     attr_reader :mass
     attr_reader :unit
     def initialize type, alpha, beta, mass = 0, unit = "oz"
-        @hop_types = [ "chinook", "cascade", "east kent golding" ]
+        @hop_types = [ "chinook", "cascade", "east kent golding", "warrior", "simcoe", "amarillo" ]
         @hop_units = { "oz" => 1, "g" => 0.035274 }
         
-        set_type( type )  
+        set_type( type )
         set_alpha( alpha )
         set_beta( beta )
         set_mass( mass )
@@ -41,12 +41,20 @@ class Hops
         raise "#{unit} is not a valid mass unit" if !@hop_units.assoc(unit)
         @unit = @hop_units.assoc(unit)[0]
     end
+
+    def convert_to! unit
+        new_mass = convert_to(unit)
+        if new_mass != nil
+            @mass = new_mass
+            set_unit(unit)
+        end
+    end
     
     def convert_to unit
         unit = unit.downcase
+        new_mass = nil
         if @hop_units[unit]
-            @mass = @hop_units[@unit] * @mass / @hop_units[unit]
-            set_unit( unit )
+            new_mass = @hop_units[@unit] * @mass / @hop_units[unit]
         end
     end
     

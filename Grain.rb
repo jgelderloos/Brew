@@ -5,7 +5,7 @@ class Grain
     attr_accessor :ppg_potential
     attr_accessor :percent_efficiency
     def initialize type, mass = 0, unit = "lbs", ppg = 45, efficiency = 70
-        @grain_types = [ "wheat", "barley", "2 row", "vienna" ]
+        @grain_types = [ "wheat", "barley", "2 row", "vienna", "british2row", "crystalmalt", "britishamber" ]
         @grain_units = { "lbs" => 1, "kg" => 2.204625}
         @ppg_potential = ppg.abs
         @percent_efficiency = efficiency.abs
@@ -34,18 +34,18 @@ class Grain
     end
     
     def convert_to! unit
-        lbs = convert_to(unit)
-        if lbs != nil
-            @mass = lbs
-            set_unit( unit )
+        new_mass = convert_to(unit)
+        if new_mass != nil
+            @mass = new_mass
+            set_unit(unit)
         end
     end
     
     def convert_to unit
         unit = unit.downcase
-        lbs = nil
+        new_mass = nil
         if @grain_units[unit]
-            lbs = @grain_units[@unit] * @mass / @grain_units[unit] 
+            new_mass = @grain_units[@unit] * @mass / @grain_units[unit] 
         end
     end
     
