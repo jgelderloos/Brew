@@ -24,10 +24,13 @@ class FileManager
     # Assume that everything is stored in the working directory
     def initialize
         @path = Dir.pwd
-        @folder = "/My Brews"
-        @dir = @path + @folder
+        @user_folder = "/My Brews"
+        @user_dir = @path + @user_folder
+        @data_folder = "/Data"
+        @data_dir = @path + @data_folder
         
-        Dir.mkdir(@dir) unless Dir.exist?(@dir)
+        Dir.mkdir(@user_dir) unless Dir.exist?(@user_dir)
+        Dir.mkdir(@data_dir) unless Dir.exist?(@data_dir)
         
         @tags = [ "name", "size unit", "size", "boil time", "grain", "type", "mass unit", "mass", "ppg", "%eff",
                   "hops", "type", "alpha", "beta", "mass unit", "mass", "yeast", "attenuation", "ratio mash",
@@ -39,7 +42,7 @@ class FileManager
         if brew.is_a? Brew
             name = brew.name
             
-            write_file = File.open(@path+"/"+name+".txt", "w+")
+            write_file = File.open(@user_dir+"/"+name+".txt", "w+")
             
             offset = 0
             offset += IO.write(write_file, "#"+@tags[0]+"# "+name+"\n", offset)
@@ -82,7 +85,7 @@ class FileManager
     end
     
     def read_brew name
-        file_data = File.read( @path+"/"+name+".txt" ).split(/\n/)
+        file_data = File.read( @user_dir+"/"+name+".txt" ).split(/\n/)
 
         brew = Brew.new
         grain = Grain.new( "wheat" )
@@ -146,5 +149,16 @@ class FileManager
             end
         end
         return brew
+    end
+
+    def read_hop_data
+        hop_data = File.read( @data_dir+"/hopdata.ini" ).split(/\n/)
+        hash = Hash.new
+
+        hop_data.each do |line|
+            m = /(.*),(.*),(.*)\Z/.match(line)
+            hash [m[1] ] = [ m[2].to_f, m[3].to_f ] if m != nil
+        end
+        return hash
     end
 end

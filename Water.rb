@@ -51,9 +51,7 @@ class Water
     def convert_to unit
         unit = unit.downcase
         vol = nil
-        if @water_units[unit]
-            vol = @water_units[@unit] * @volume / @water_units[unit]
-        end
+		vol = @water_units[@unit] * @volume / @water_units[unit] if @water_units[unit]
     end
     
     def add volume

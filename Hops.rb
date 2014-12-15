@@ -23,20 +23,27 @@ class Hops
     attr_reader :beta
     attr_reader :mass
     attr_reader :unit
-    def initialize type, alpha, beta, mass = 0, unit = "oz"
-        @hop_types = [ "chinook", "cascade", "east kent golding", "warrior", "simcoe", "amarillo" ]
+    def initialize type, alpha = nil, beta = nil, mass = 0, unit = "oz"
+
+        fm = FileManager.new
+        @hop_types = fm.read_hop_data
         @hop_units = { "oz" => 1, "g" => 0.035274 }
         
         set_type( type )
+
+        alpha = @hop_types[type][0] if alpha == nil
         set_alpha( alpha )
+
+        beta = @hop_types[type][1] if beta == nil
         set_beta( beta )
+
         set_mass( mass )
         set_unit( unit )
     end
     
     def set_type type
         type = type.downcase
-        raise "#{type} is not a valide hop type" if !@hop_types.include? type
+        raise "#{type} is not a valid hop type" if !@hop_types.include? type
         @type = type
     end
     
@@ -72,9 +79,7 @@ class Hops
     def convert_to unit
         unit = unit.downcase
         new_mass = nil
-        if @hop_units[unit]
-            new_mass = @hop_units[@unit] * @mass / @hop_units[unit]
-        end
+        new_mass = @hop_units[@unit] * @mass / @hop_units[unit] if @hop_units[unit]
     end
     
     private :set_type

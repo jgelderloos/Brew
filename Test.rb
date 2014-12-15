@@ -35,10 +35,6 @@ class Tester < Test::Unit::TestCase
         end
         
         assert_raise RuntimeError do
-            h = Hops.new( "chinook", nil, 0 )
-        end
-        
-        assert_raise RuntimeError do
             h = Hops.new( "chinook", 0, "five" )
         end
         
@@ -47,6 +43,14 @@ class Tester < Test::Unit::TestCase
         end
         
         # Test valid inputs
+        
+        h = Hops.new( "warrior" )
+        assert h.type == "warrior"
+        assert h.alpha == 15.7
+        assert h.beta == 6.2
+        assert h.mass == 0
+        assert h.unit == "oz"
+
         h = Hops.new( "chinook", 5.6, 10 )
         
         assert h.type == "chinook"
@@ -822,7 +826,7 @@ class Tester < Test::Unit::TestCase
         assert ibu == 56.565008025682175
     end
 
-    def test_file_manager
+    def test_file_manager_brew
         b = Brew.new( "Wheat Beer" )
         b.volume_final = Water.new( 5, "gal" )
         b.min_boil_time = 60
@@ -882,5 +886,19 @@ class Tester < Test::Unit::TestCase
         assert b2.volume_mash_dead_loss.volume == 0.125
         assert b2.rate_boil_off == 1
         assert b2.percent_shrinkage == 4
+    end
+
+    def test_file_manager_data
+        fm = FileManager.new
+
+        h = fm.read_hop_data
+
+        assert h.is_a? Hash
+        assert h["amarillo"] == [8.2, 6.2]
+        assert h["cascade"] == [7.1, 3.2]
+        assert h["chinook"] == [5.6, 10]
+        assert h["east kent golding"] == [3, 4.3]
+        assert h["simcoe"] == [12.7, 4]
+        assert h["warrior"] == [15.7, 6.2]
     end
 end

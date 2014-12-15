@@ -29,21 +29,25 @@ b.rate_boil_off = 0.7
 b.percent_shrinkage = 4
 
 b.calc_volume_mash!
-puts "Test"
-puts "Mash volume: #{b.volume_mash.volume}"
+printf( "Mash volume: %2.3f %s\n", b.volume_mash.volume, b.volume_mash.unit )
+
 b.calc_volume_mash_loss!
 b.calc_volume_boil_loss!
 b.calc_volume_shrinkage_loss!
 b.calc_volume_preboil!
-puts "Pre boil: #{b.volume_preboil.volume}"
+printf( "Pre boil: %2.3f %s\n", b.volume_preboil.volume, b.volume_preboil.unit )
+
 b.calc_volume_sparge!
-puts "Sparge volume: #{b.volume_sparge.volume}"
+printf( "Sparge volume: %2.3f %s\n", b.volume_sparge.volume, b.volume_sparge.unit )
+
 b.calc_gravity_original!
-puts "OG: #{b.gravity_original}"
+printf( "OG: %2.4f\n", b.gravity_original )
+
 b.calc_gravity_final!
-puts "FG: #{b.gravity_final}"
+printf( "FG: %2.4f\n", b.gravity_final )
+
 b.calc_percent_abv!
-puts "ABV: #{b.percent_abv}"
+printf( "ABV: %2.2f\n", b.percent_abv )
 
 fm = FileManager.new
 
