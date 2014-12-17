@@ -151,12 +151,13 @@ class FileManager
         return brew
     end
 
-    def read_hop_data
-        hop_data = File.read( @data_dir+"/hopdata.ini" ).split(/\n/)
+    def read_data file_name
+        data = File.read( @data_dir+"/"+file_name ).split(/\n/)
         hash = Hash.new
 
-        hop_data.each do |line|
+        data.each do |line|
             m = /(.*),(.*),(.*)\Z/.match(line)
+            #puts "m1: #{m[1]} m2: #{m[2]} m3: #{m[3]}"
             hash [m[1] ] = [ m[2].to_f, m[3].to_f ] if m != nil
         end
         return hash

@@ -51,7 +51,7 @@ class Tester < Test::Unit::TestCase
         assert h.mass == 0
         assert h.unit == "oz"
 
-        h = Hops.new( "chinook", 5.6, 10 )
+        h = Hops.new( "Chinook", 5.6, 10 )
         
         assert h.type == "chinook"
         assert h.alpha == 5.6
@@ -151,6 +151,14 @@ class Tester < Test::Unit::TestCase
         end
         
         # Test valid inputs
+        
+        g = Grain.new( "british amber" )
+        
+        assert g.type == "british amber"
+        assert g.mass == 0
+        assert g.unit == "lbs"
+        assert g.ppg_potential == 35
+        assert g.percent_efficiency = 75
         
         g = Grain.new( "wheat" )
         
@@ -379,7 +387,7 @@ class Tester < Test::Unit::TestCase
         
         b.add_grain(7)
         assert b.grains == [g]
-        
+
         g2 = Grain.new( "Barley", 2, "lbs" )
         b.add_grain(g2)
         assert b.grains == [g,g2]
@@ -891,7 +899,7 @@ class Tester < Test::Unit::TestCase
     def test_file_manager_data
         fm = FileManager.new
 
-        h = fm.read_hop_data
+        h = fm.read_data( "hopdata.ini" )
 
         assert h.is_a? Hash
         assert h["amarillo"] == [8.2, 6.2]

@@ -23,21 +23,33 @@ class Grain
     attr_reader   :unit
     attr_accessor :ppg_potential
     attr_accessor :percent_efficiency
-    def initialize type, mass = 0, unit = "lbs", ppg = 45, efficiency = 70
-        @grain_types = [ "wheat", "barley", "2 row", "vienna", "british2row", "crystalmalt", "britishamber" ]
+   
+    @@grains_loaded = false
+
+    def initialize type, mass = 0, unit = "lbs", ppg = nil, efficiency = nil
+
+        if ( @@grains_loaded == false )
+            fm = FileManager.new
+            @@grain_types = fm.read_data( "graindata.ini" )
+            @@grains_loaded = true
+        end
         @grain_units = { "lbs" => 1, "kg" => 2.204625}
-        @ppg_potential = ppg.abs
-        @percent_efficiency = efficiency.abs
     
         set_type( type )
         set_mass( mass )
         set_unit( unit )
+
+        ppg = @@grain_types[@type][0] if ppg == nil 
+        set_ppg( ppg )
+            
+        efficiency = @@grain_types[@type][0] if efficiency == nil
+        set_efficiency( efficiency )
         
     end
     
     def set_type type
         type = type.downcase
-        raise "#{type} is not a valide grain type" if !@grain_types.include? type
+        raise "#{type} is not a valid grain type" if !@@grain_types.include? type
         @type = type
     end
     
@@ -50,6 +62,16 @@ class Grain
         unit = unit.downcase
         raise "#{unit} is not a valid mass unit" if !@grain_units.assoc(unit)
         @unit = @grain_units.assoc(unit)[0]
+    end
+
+    def set_ppg ppg
+        raise "#{ppg} is not a numeric value" if !ppg.is_a? Numeric
+        @ppg_potential = ppg.abs
+    end
+
+    def set_efficiency efficiency
+        raise "#{efficiency} is not a numeric value" if !efficiency.is_a? Numeric
+        @percent_efficiency = efficiency.abs
     end
     
     def convert_to! unit

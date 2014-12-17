@@ -23,18 +23,25 @@ class Hops
     attr_reader :beta
     attr_reader :mass
     attr_reader :unit
+
+    @@hops_loaded = false
+
     def initialize type, alpha = nil, beta = nil, mass = 0, unit = "oz"
 
-        fm = FileManager.new
-        @hop_types = fm.read_hop_data
+        if( @@hops_loaded == false )
+            fm = FileManager.new
+            @@hop_types = fm.read_data( "hopdata.ini" )
+            @@hops_loaded = true
+        end
+
         @hop_units = { "oz" => 1, "g" => 0.035274 }
         
         set_type( type )
 
-        alpha = @hop_types[type][0] if alpha == nil
+        alpha = @@hop_types[@type][0] if alpha == nil
         set_alpha( alpha )
 
-        beta = @hop_types[type][1] if beta == nil
+        beta = @@hop_types[@type][1] if beta == nil
         set_beta( beta )
 
         set_mass( mass )
@@ -43,7 +50,7 @@ class Hops
     
     def set_type type
         type = type.downcase
-        raise "#{type} is not a valid hop type" if !@hop_types.include? type
+        raise "#{type} is not a valid hop type" if !@@hop_types.include? type
         @type = type
     end
     

@@ -8,9 +8,9 @@ require_relative "FileManager"
 b = Brew.new("Dogfish60")
 b.volume_final = Water.new( 5, "gal" )
 b.min_boil_time = 60
-g = Grain.new( "British2Row", 12.5, "lbs", 37, 75 )
-g2 = Grain.new( "CrystalMalt", 0.25, "lbs", 34, 75 )
-g3 = Grain.new( "BritishAmber", 0.25, "lbs", 35, 75 )
+g = Grain.new( "British 2 Row", 12.5, "lbs", 37, 75 )
+g2 = Grain.new( "Crystal Malt", 0.25, "lbs", 34, 75 )
+g3 = Grain.new( "British Amber", 0.25, "lbs", 35, 75 )
 b.add_grain(g)
 b.add_grain(g2)
 b.add_grain(g3)
