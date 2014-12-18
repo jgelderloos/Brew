@@ -109,9 +109,9 @@ class FileManager
             when /#{@tags[4]} (\d) #{@tags[7]}/
                 grain.set_mass( tag[2].to_f )
             when /#{@tags[4]} (\d) #{@tags[8]}/
-                grain.ppg_potential = tag[2].to_f
+                grain.set_ppg( tag[2].to_f )
             when /#{@tags[4]} (\d) #{@tags[9]}/
-                grain.percent_efficiency = tag[2].to_f
+                grain.set_efficiency( tag[2].to_f )
                 brew.add_grain( grain )
             when /#{@tags[10]} (\d) #{@tags[11]}/
                 hops = Hops.new( tag[2], 0, 0 )

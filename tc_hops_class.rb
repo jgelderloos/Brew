@@ -23,7 +23,7 @@ require_relative "Hops"
 
 class TestHops < Test::Unit::TestCase
     
-    # Testing bad inits
+    # Testing bad inits --------------------------------------
 
     def test_init_bad_type_1
         # Test passing bad type
@@ -84,7 +84,7 @@ class TestHops < Test::Unit::TestCase
     # Testing valid inputs -----------------------------------------------
 
     def test_init_good_type_1
-        # Tests init with only tpye
+        # Tests init with only type
         # Tests type with capital is matched to non-cap name
         # Tests alpha beta values are loaded correctly
         h = Hops.new( "Warrior" )
@@ -352,7 +352,7 @@ class TestHops < Test::Unit::TestCase
         assert_equal( "oz", h.unit )
     end
 
-    # Testing conversion of units
+    # Testing conversion of units -------------------------------------
 
     def test_convert_to_bad_1
         # Tests passing bad unit
@@ -380,7 +380,7 @@ class TestHops < Test::Unit::TestCase
         assert_equal( "oz", h.unit )
     end
 
-    def test_band_convert_to_bad_2
+    def test_bang_convert_to_bad_2
         # Tests passing nil
         h = Hops.new( "chinook", 3.4, 2, 1, "oz" )
         

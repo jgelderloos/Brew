@@ -35,11 +35,11 @@ class Tester < Test::Unit::TestCase
             h = Hops.new( "blah", 0, 0 )
         end
         
-        assert_raise RuntimeError do
+        assert_raise NoMethodError do
             h = Hops.new( "chinook", 0, "five" )
         end
         
-        assert_raise RuntimeError do
+        assert_raise NoMethodError do
             h = Hops.new( "chinook", 0, 0, "five" )
         end
         
@@ -147,7 +147,7 @@ class Tester < Test::Unit::TestCase
             g = Grain.new( "blah" )
         end
         
-        assert_raise RuntimeError do
+        assert_raise NoMethodError do
             g = Grain.new( "wheat", nil )
         end
         
@@ -159,7 +159,7 @@ class Tester < Test::Unit::TestCase
         assert g.mass == 0
         assert g.unit == "lbs"
         assert g.ppg_potential == 35
-        assert g.percent_efficiency = 75
+        assert g.percent_efficiency == 75
         
         g = Grain.new( "wheat" )
         
@@ -167,7 +167,7 @@ class Tester < Test::Unit::TestCase
         assert g.mass == 0
         assert g.unit == "lbs"
         assert g.ppg_potential == 45
-        assert g.percent_efficiency = 70
+        assert g.percent_efficiency == 70
         
         g = Grain.new( "wheat", 12, "lbs" )
         
@@ -175,7 +175,7 @@ class Tester < Test::Unit::TestCase
         assert g.mass == 12
         assert g.unit == "lbs"
         assert g.ppg_potential == 45
-        assert g.percent_efficiency = 70
+        assert g.percent_efficiency == 70
         
         g = Grain.new( "wheat", 12, "lbs", 33 )
         
@@ -183,7 +183,7 @@ class Tester < Test::Unit::TestCase
         assert g.mass == 12
         assert g.unit == "lbs"
         assert g.ppg_potential == 33
-        assert g.percent_efficiency = 70
+        assert g.percent_efficiency == 70
         
         g = Grain.new( "wheat", 12, "lbs", 45, 76 )
         
@@ -191,7 +191,7 @@ class Tester < Test::Unit::TestCase
         assert g.mass == 12
         assert g.unit == "lbs"
         assert g.ppg_potential == 45
-        assert g.percent_efficiency = 76
+        assert g.percent_efficiency == 76
         
         # Test no negative mass
         

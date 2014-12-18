@@ -17,12 +17,14 @@
 #   Description:
 #   Holds basic info about a type and amount of grains
 
+require_relative "FileManager"
+
 class Grain
     attr_reader   :type
     attr_reader   :mass
     attr_reader   :unit
-    attr_accessor :ppg_potential
-    attr_accessor :percent_efficiency
+    attr_reader :ppg_potential
+    attr_reader :percent_efficiency
    
     @@grains_loaded = false
 
@@ -42,7 +44,7 @@ class Grain
         ppg = @@grain_types[@type][0] if ppg == nil 
         set_ppg( ppg )
             
-        efficiency = @@grain_types[@type][0] if efficiency == nil
+        efficiency = @@grain_types[@type][1] if efficiency == nil
         set_efficiency( efficiency )
         
     end
@@ -54,7 +56,6 @@ class Grain
     end
     
     def set_mass mass
-        raise "#{mass} is not a numeric value" if !mass.is_a? Numeric
         @mass = mass.abs
     end
     
@@ -65,12 +66,10 @@ class Grain
     end
 
     def set_ppg ppg
-        raise "#{ppg} is not a numeric value" if !ppg.is_a? Numeric
         @ppg_potential = ppg.abs
     end
 
     def set_efficiency efficiency
-        raise "#{efficiency} is not a numeric value" if !efficiency.is_a? Numeric
         @percent_efficiency = efficiency.abs
     end
     
