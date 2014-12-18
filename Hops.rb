@@ -17,6 +17,8 @@
 #   Description:
 #   Holds basic info about a type and amount of hops
 
+require_relative "FileManager"
+
 class Hops
     attr_reader :type
     attr_reader :alpha
@@ -55,17 +57,14 @@ class Hops
     end
     
     def set_alpha alpha
-        raise "#{alpha} is not a float value" if !alpha.is_a? Numeric
         @alpha = alpha.abs
     end
     
     def set_beta beta
-        raise "#{beta} is not a numeric value" if !beta.is_a? Numeric
         @beta = beta.abs
     end
     
     def set_mass mass
-        raise "#{mass} is not a numeric value" if !mass.is_a? Numeric
         @mass = mass.abs
     end
     

@@ -27,6 +27,7 @@ require_relative "Yeast"
 require_relative "FileManager"
 
 class Tester < Test::Unit::TestCase
+
     def test_hops
     
         # Test invalid inputs
