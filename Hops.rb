@@ -20,73 +20,72 @@
 require_relative "FileManager"
 
 class Hops
-    attr_reader :type
-    attr_reader :alpha
-    attr_reader :beta
-    attr_reader :mass
-    attr_reader :unit
+  attr_reader :type
+  attr_reader :alpha
+  attr_reader :beta
+  attr_reader :mass
+  attr_reader :unit
 
-    @@hops_loaded = false
+  @@hops_loaded = false
 
-    def initialize type, alpha = nil, beta = nil, mass = 0, unit = "oz"
-
-        if( @@hops_loaded == false )
-            fm = FileManager.new
-            @@hop_types = fm.read_data( "hopdata.ini" )
-            @@hops_loaded = true
-        end
-
-        @hop_units = { "oz" => 1, "g" => 0.035274 }
-        
-        set_type( type )
-
-        alpha = @@hop_types[@type][0] if alpha == nil
-        set_alpha( alpha )
-
-        beta = @@hop_types[@type][1] if beta == nil
-        set_beta( beta )
-
-        set_mass( mass )
-        set_unit( unit )
+  def initialize type, alpha = nil, beta = nil, mass = 0, unit = "oz"
+    if( @@hops_loaded == false )
+      fm = FileManager.new
+      @@hop_types = fm.read_data( "hopdata.ini" )
+      @@hops_loaded = true
     end
+
+    @hop_units = { "oz" => 1, "g" => 0.035274 }
     
-    def set_type type
-        type = type.downcase
-        raise "#{type} is not a valid hop type" if !@@hop_types.include? type
-        @type = type
-    end
-    
-    def set_alpha alpha
-        @alpha = alpha.abs
-    end
-    
-    def set_beta beta
-        @beta = beta.abs
-    end
-    
-    def set_mass mass
-        @mass = mass.abs
-    end
-    
-    def set_unit unit
-        unit = unit.downcase
-        raise "#{unit} is not a valid mass unit" if !@hop_units.assoc(unit)
-        @unit = @hop_units.assoc(unit)[0]
-    end
+    set_type( type )
 
-    def convert_to! unit
-        new_mass = convert_to(unit)
-        if new_mass != nil
-            @mass = new_mass
-            set_unit(unit)
-        end
+    alpha = @@hop_types[@type][0] if alpha == nil
+    set_alpha( alpha )
+
+    beta = @@hop_types[@type][1] if beta == nil
+    set_beta( beta )
+
+    set_mass( mass )
+    set_unit( unit )
+  end
+  
+  def set_type type
+    type = type.downcase
+    raise "#{type} is not a valid hop type" if !@@hop_types.include? type
+    @type = type
+  end
+  
+  def set_alpha alpha
+    @alpha = alpha.abs
+  end
+  
+  def set_beta beta
+    @beta = beta.abs
+  end
+  
+  def set_mass mass
+    @mass = mass.abs
+  end
+  
+  def set_unit unit
+    unit = unit.downcase
+    raise "#{unit} is not a valid mass unit" if !@hop_units.assoc(unit)
+    @unit = @hop_units.assoc(unit)[0]
+  end
+
+  def convert_to! unit
+    new_mass = convert_to(unit)
+    if new_mass != nil
+      @mass = new_mass
+      set_unit(unit)
     end
-    
-    def convert_to unit
-        unit = unit.downcase
-        new_mass = nil
-        new_mass = @hop_units[@unit] * @mass / @hop_units[unit] if @hop_units[unit]
-    end
-    
-    private :set_type
+  end
+  
+  def convert_to unit
+    unit = unit.downcase
+    new_mass = nil
+    new_mass = @hop_units[@unit] * @mass / @hop_units[unit] if @hop_units[unit]
+  end
+  
+  private :set_type
 end 

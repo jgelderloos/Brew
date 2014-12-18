@@ -18,20 +18,20 @@
 #   Holds basic info about a type of yeast.
 
 class Yeast
-    attr_reader   :name
-    attr_accessor :percent_attenuation
-    def initialize name, attenuation = 75
-        @name = name.to_s
-        set_attenuation( attenuation )
-    end
-    
-    def set_name name
-        @name = name.to_s
-    end
-	
-	def set_attenuation attenuation
-		raise "#{attenuation} is not a numeric value" if !attenuation.is_a? Numeric
-		@percent_attenuation = attenuation.abs
-	end
+  attr_reader   :name
+  attr_accessor :percent_attenuation
+  
+  def initialize name, attenuation = 75
+    @name = name.to_s
+    set_attenuation( attenuation )
+  end
+   
+  def set_name name
+    @name = name.to_s
+  end
+  
+  def set_attenuation attenuation
+    @percent_attenuation = attenuation.abs
+  end
 
 end

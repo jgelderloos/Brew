@@ -339,7 +339,7 @@ class Tester < Test::Unit::TestCase
         assert y.name == "12"
         assert y.percent_attenuation == 75
 
-        assert_raise RuntimeError do
+        assert_raise NoMethodError do
             y = Yeast.new( "My Yeast", "bad num" )
         end
           
