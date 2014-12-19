@@ -19,7 +19,7 @@
 
 class Yeast
   attr_reader   :name
-  attr_accessor :percent_attenuation
+  attr_reader :percent_attenuation
   
   def initialize name, attenuation = 75
     @name = name.to_s

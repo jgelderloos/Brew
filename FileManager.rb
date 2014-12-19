@@ -127,7 +127,7 @@ class FileManager
       when @tags[16]
         yeast = Yeast.new( tag[2] )
       when @tags[17]
-        yeast.percent_attenuation = tag[2].to_f
+        yeast.set_attenuation( tag[2].to_f )
         brew.yeast = yeast
       when @tags[18]
         brew.ratio_mash = tag[2].to_f

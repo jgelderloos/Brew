@@ -12,10 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-#   Class: TestGrain
+#   Class: TestWater
 #
 #   Description:
-#   Unit tests for the Grain class
+#   Unit tests for the Water class
 
 require "test/unit"
 
@@ -71,7 +71,7 @@ class TestWater < Test::Unit::TestCase
     assert_equal( "gal", w.unit )
   end
 
-def test_init_good_volume_2
+  def test_init_good_volume_2
     # Tests init with negative volume
     w = Water.new( -2.5 )
 
