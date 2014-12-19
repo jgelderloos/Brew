@@ -19,7 +19,7 @@
 
 require "test/unit"
 
-require_relative "Hops"
+require_relative "../lib/Hops"
 
 class TestHops < Test::Unit::TestCase
     

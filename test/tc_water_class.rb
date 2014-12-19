@@ -19,7 +19,7 @@
 
 require "test/unit"
 
-require_relative "Water"
+require_relative "../lib/Water"
 
 class TestWater < Test::Unit::TestCase
     

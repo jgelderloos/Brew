@@ -19,7 +19,7 @@
 
 require "test/unit"
 
-require_relative "FileManager"
+require_relative "../lib/FileManager"
 
 class TestFileManager < Test::Unit::TestCase
     

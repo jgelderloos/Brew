@@ -19,7 +19,7 @@
 
 require "test/unit"
 
-require_relative "Yeast"
+require_relative "../lib/Yeast"
 
 class TestYeast < Test::Unit::TestCase
     

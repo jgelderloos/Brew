@@ -23,7 +23,12 @@ class FileManager
 
   # Assume that everything is stored in the working directory
   def initialize
+    # Strip of the last folder and change it to lib
+    # incase we are running from /test
     @path = Dir.pwd
+    m = /(.*\/).*\Z/.match @path
+    @path = m[1] + "lib"
+
     @user_folder = "/My Brews"
     @user_dir = @path + @user_folder
     @data_folder = "/Data"

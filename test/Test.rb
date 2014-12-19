@@ -19,12 +19,12 @@
 
 require "test/unit"
 
-require_relative "Hops"
-require_relative "Grain"
-require_relative "Water"
-require_relative "Brew"
-require_relative "Yeast"
-require_relative "FileManager"
+require_relative "../lib/Hops"
+require_relative "../lib/Grain"
+require_relative "../lib/Water"
+require_relative "../lib/Brew"
+require_relative "../lib/Yeast"
+require_relative "../lib/FileManager"
 
 class Tester < Test::Unit::TestCase
 
