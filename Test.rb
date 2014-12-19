@@ -730,7 +730,7 @@ class Tester < Test::Unit::TestCase
         # Test calculating final gravity
 
         b = Brew.new( "My Brew" )
-        assert b.calc_gravity_final == 0.75
+        assert b.calc_gravity_final == 1
         
         b = Brew.new( "My Brew" )
         b.volume_final.volume = 5
@@ -779,7 +779,7 @@ class Tester < Test::Unit::TestCase
         # Test calculation of ABV
        
         b = Brew.new( "My Brew" )
-        assert b.calc_percent_abv == nil
+        assert b.calc_percent_abv == 0
 
         b = Brew.new( "My Brew" )
         b.volume_final.volume = 5
@@ -828,7 +828,7 @@ class Tester < Test::Unit::TestCase
         b.add_hops(h2)
         b.add_hops(h3)
         
-        mass = b.calc_mass_hops
+        mass = b.total_hops_mass?
         assert mass = 7
 
         ibu = b.calc_ibu

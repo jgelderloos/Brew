@@ -46,11 +46,13 @@ class Brew
   attr_reader   :gravity_original
   attr_reader   :gravity_final
   attr_reader   :percent_abv
+  attr_accessor :ibu
   
   WEIGHT_ETHYL_ALCOHOL = 1.05
   DENSITY_ETHYL_ALCOHOL = 0.79
   
   def initialize name = ""
+    # TODO: Possibly add setters with .abs for a lot of these
     @name = name.to_s
     @grains = []
     @hops = []
@@ -70,8 +72,10 @@ class Brew
     @volume_shrinkage_loss = Water.new
     @percent_shrinkage = 4
     @volume_final = Water.new
-    @gravity_original = 0
-    @gravity_final = 0
+    @gravity_original = 1
+    @gravity_final = 1
+    @percent_abv = 0
+    @ibu = 0
   end
   
   def add_grain grain
@@ -107,7 +111,7 @@ class Brew
     return lbs_of_grain
   end
   
-  # Volume of water usef in the mash
+  # Volume of water used in the mash
   def calc_volume_mash!
     lbs = total_grain_mass?
     qts = lbs * @ratio_mash.abs
@@ -184,6 +188,7 @@ class Brew
     return @volume_preboil.convert_to( "gal" ) - (@volume_mash.convert_to( "gal" ) - @volume_mash_loss.convert_to( "gal" ))
   end
   
+  # calculating original gravity
   def calc_gravity_original!
     @gravity_original = calc_gravity_original
   end
@@ -202,6 +207,7 @@ class Brew
     gravity = (gravity / 1000.0) + 1
   end
   
+  # calculating final gravity
   def calc_gravity_final!
     @gravity_final = calc_gravity_final
   end
@@ -210,20 +216,18 @@ class Brew
     gravity = (( @gravity_original - 1 ) * (1 - (@yeast.percent_attenuation / 100.0 ))) + 1
   end
   
+  # calculating abv
   def calc_percent_abv!
     @percent_abv = calc_percent_abv
   end
   
   def calc_percent_abv
-    abv = nil
-    if( @gravity_final != 0)
-      abw = ((@gravity_original - @gravity_final)*WEIGHT_ETHYL_ALCOHOL)/@gravity_final
-      abv = (abw / DENSITY_ETHYL_ALCOHOL) * 100.0
-    end
+    abw = ((@gravity_original - @gravity_final)*WEIGHT_ETHYL_ALCOHOL)/@gravity_final
+    abv = (abw / DENSITY_ETHYL_ALCOHOL) * 100.0
   end
  
   # Returns mass of hops in oz
-  def calc_mass_hops
+  def total_hops_mass?
     oz_of_hops = 0
     @hops.each do |hop|
       oz_of_hops = oz_of_hops + hop.convert_to( "oz" )
@@ -232,10 +236,11 @@ class Brew
   end
 
   # Very simple IBU calculation, not very accurate
+  # TODO: add ! version
   def calc_ibu
     ibu = 0
     @hops.each do |hop|
-      ibu += ( (hop.alpha * 0.3 / 0.01335 / @volume_final.volume ) * (hop.convert_to("oz").to_f / calc_mass_hops().to_f ) ) 
+      ibu += ( (hop.alpha * 0.3 / 0.01335 / @volume_final.volume ) * (hop.convert_to("oz").to_f / total_hops_mass?().to_f ) ) 
     end
     return ibu
   end
