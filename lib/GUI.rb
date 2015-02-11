@@ -23,7 +23,7 @@ require 'Qt'
 
 
 class BrewApp < Qt::MainWindow
-  slots( 'item_clicked(QListWidgetItem*)', 'add_item()', 'on_activated(QString)', 'on_name_changed(QString)', 'on_mass_changed(QString)', 
+  slots( 'item_clicked(QListWidgetItem*)', 'add_item()', 'edit_item()', 'on_activated(QString)', 'on_name_changed(QString)', 'on_mass_changed(QString)', 
          'on_unit_activated(QString)', 'on_ppg_changed(QString)', 'on_efficiency_changed(QString)', 'on_alpha_changed(QString)', 'on_beta_changed(QString)',
          'on_attenuation_changed(QString)' )
 
@@ -205,6 +205,8 @@ class BrewApp < Qt::MainWindow
     connect( @button_add, SIGNAL( "clicked()" ), SLOT( "add_item()" ) )
     
 		@button_edit = Qt::PushButton.new( "Edit", self )
+    connect( @button_edit, SIGNAL( "clicked()" ), SLOT( "edit_item()" ) )
+
 		@button_remove = Qt::PushButton.new( "Remove", self )
 		
     # Create vertical box for the buttons
@@ -265,44 +267,56 @@ class BrewApp < Qt::MainWindow
   def on_activated text
     @type = text.downcase
     if( text == "Grain" )
-      @alpha_box.hide
-      @beta_box.hide
-      @ppg_box.show
-      @efficiency_box.show
-      @attenuation_box.hide
-      @mass_box.show
-      @unit_box.show
-      @unit_box.removeItem( 0 )
-      @unit_box.removeItem( 0 )
-      @unit_box.addItem( "lbs" )
-      @unit_box.addItem( "Kg" )
-      @unit = "lbs"
+      self.set_boxes_grain
     end
 
     if( text == "Hops" )
-      @alpha_box.show
-      @beta_box.show
-      @ppg_box.hide
-      @efficiency_box.hide
-      @attenuation_box.hide
-      @mass_box.show
-      @unit_box.show
-      @unit_box.removeItem( 0 )
-      @unit_box.removeItem( 0 )
-      @unit_box.addItem( "oz" )
-      @unit_box.addItem( "g" )
-      @unit = "oz"
+      self.set_boxes_hops
     end
 
     if( text == "Yeast" )
-      @alpha_box.hide
-      @beta_box.hide
-      @ppg_box.hide
-      @efficiency_box.hide
-      @attenuation_box.show
-      @mass_box.hide
-      @unit_box.hide
+      self.set_boxes_yeast
     end
+  end
+
+  def set_boxes_grain
+    @alpha_box.hide
+    @beta_box.hide
+    @ppg_box.show
+    @efficiency_box.show
+    @attenuation_box.hide
+    @mass_box.show
+    @unit_box.show
+    @unit_box.removeItem( 0 )
+    @unit_box.removeItem( 0 )
+    @unit_box.addItem( "lbs" )
+    @unit_box.addItem( "Kg" )
+    @unit = "lbs"
+  end
+
+  def set_boxes_hops
+    @alpha_box.show
+    @beta_box.show
+    @ppg_box.hide
+    @efficiency_box.hide
+    @attenuation_box.hide
+    @mass_box.show
+    @unit_box.show
+    @unit_box.removeItem( 0 )
+    @unit_box.removeItem( 0 )
+    @unit_box.addItem( "oz" )
+    @unit_box.addItem( "g" )
+    @unit = "oz"
+  end
+
+  def set_boxes_yeast
+    @alpha_box.hide
+    @beta_box.hide
+    @ppg_box.hide
+    @efficiency_box.hide
+    @attenuation_box.show
+    @mass_box.hide
+    @unit_box.hide
   end
 
   # Functions that update data from the GUI
@@ -338,19 +352,14 @@ class BrewApp < Qt::MainWindow
     @attenuation = att
   end
 
+  # Set the curently highlighted item 
   def item_clicked item
-    if( item != @grain_header && item != @hops_header && item != @yeast_header )
-      if( @item_list.currentRow <= @end_of_grains )
-        puts "grain clicked"  
-        puts "name: #{(item.data 1).toString}"
-      elsif( @item_list.currentRow <= @end_of_hops )
-        puts "hops clicked"
-      else
-        puts "yeast clicked"
-      end
-    end
+    @current_item = item
   end
   
+  # TODO When the add button is clicked and boxes are not filled out an error occurs.
+  # We need to display a dialog if required info is missing and be ok with non required
+  # data being empty
   def add_item
     case @type
     # Send current info to controller
@@ -364,11 +373,23 @@ class BrewApp < Qt::MainWindow
   end
 
   def edit_item
-    case @type
-    # Send updated info to controller
-    when "grain"
-    when "hops"
-    when "yeast"
+    if( @current_item != @grain_header && @current_item != @hops_header && @current_item != @yeast_header )
+      if( @item_list.currentRow <= @end_of_grains )
+        @type_combo.setCurrentIndex( 0 )
+        self.set_boxes_grain
+        @name_box.setText( (@current_item.data Qt::UserRole).toString )
+        @mass_box.setText( (@current_item.data Qt::UserRole+1).toString )
+        index = @unit_box.findText( (@current_item.data Qt::UserRole+2).toString, Qt::MatchFixedString )
+        @unit_box.setCurrentIndex( index )
+        @ppg_box.setText( (@current_item.data Qt::UserRole+3).toString )
+        @efficiency_box.setText( (@current_item.data Qt::UserRole+4).toString )
+      elsif( @item_list.currentRow <= @end_of_hops )
+        @type_combo.setCurrentIndex( 1 )
+        self.set_boxes_hops 
+      else
+        @type_combo.setCurrentIndex( 2 )
+        self.set_boxes_yeast
+      end
     end
   end
 
@@ -383,8 +404,11 @@ class BrewApp < Qt::MainWindow
 
         item = Qt::ListWidgetItem.new( @grain_strings[index] )
         item.setFont( @font )
-        # TODO this is causing the text to be indented 
-        item.setData( 1, Qt::Variant.from_value( grain.type ) )
+        item.setData( Qt::UserRole, Qt::Variant.from_value( grain.type ) )
+        item.setData( Qt::UserRole+1, Qt::Variant.from_value( grain.mass ) )
+        item.setData( Qt::UserRole+2, Qt::Variant.from_value( grain.unit ) )
+        item.setData( Qt::UserRole+3, Qt::Variant.from_value( grain.ppg_potential ) )
+        item.setData( Qt::UserRole+4, Qt::Variant.from_value( grain.percent_efficiency ) )
         @item_list.insertItem( @end_of_grains+1, item )
         @end_of_grains += 1
         @end_of_hops += 1
