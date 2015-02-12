@@ -45,23 +45,22 @@ class Main
     ppg = nil if ppg == 0
     efficiency = nil if efficiency == 0
     g = Grain.new( name, mass.to_f, unit, ppg, efficiency )
-    @brew.add_grain( g )
+    g = @brew.add_grain( g )
     # Throw the brew back to the GUI to be displayed
     @gui.brew_update( @brew )
+    return g
   end
 
   def add_hops( name, alpha, beta, mass, unit )
     h = Hops.new( name, alpha.to_f, beta.to_f, mass.to_f, unit )
     @brew.add_hops( h )
     @gui.brew_update( @brew )
-    return h
   end
 
   def add_yeast( name, attenuation )
     y = Yeast.new( name, attenuation.to_f )
     @brew.yeast = y
     @gui.brew_update( @brew )
-    return y
   end
 
 

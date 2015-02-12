@@ -23,8 +23,9 @@ require 'Qt'
 
 
 class BrewApp < Qt::MainWindow
-  slots( 'item_clicked(QListWidgetItem*)', 'add_item()', 'edit_item()', 'on_activated(QString)', 'on_name_changed(QString)', 'on_mass_changed(QString)', 
-         'on_unit_activated(QString)', 'on_ppg_changed(QString)', 'on_efficiency_changed(QString)', 'on_alpha_changed(QString)', 'on_beta_changed(QString)',
+  slots( 'item_clicked(QListWidgetItem*)', 'add_clicked()', 'edit_item()', 'remove_clicked()', 'on_activated(QString)', 'on_name_changed(QString)', 
+         'on_mass_changed(QString)', 'on_unit_activated(QString)', 'on_ppg_changed(QString)', 'on_efficiency_changed(QString)', 
+         'on_alpha_changed(QString)', 'on_beta_changed(QString)',
          'on_attenuation_changed(QString)' )
 
 	def initialize parent = nil
@@ -167,7 +168,6 @@ class BrewApp < Qt::MainWindow
     @mass_box = Qt::LineEdit.new self
     connect( @mass_box, SIGNAL( "textChanged(QString)" ), self, SLOT("on_mass_changed(QString)") )
     @mass_box.setPlaceholderText( "Enter mass" )
-
     @unit_box = Qt::ComboBox.new self
     @unit_box.addItem( "lbs" )
     @unit_box.addItem( "Kg" )
@@ -202,12 +202,13 @@ class BrewApp < Qt::MainWindow
   def create_button_vbox
     # Create buttons and assign signals
 		@button_add = Qt::PushButton.new( "Add", self )
-    connect( @button_add, SIGNAL( "clicked()" ), SLOT( "add_item()" ) )
+    connect( @button_add, SIGNAL( "clicked()" ), SLOT( "add_clicked()" ) )
     
 		@button_edit = Qt::PushButton.new( "Edit", self )
     connect( @button_edit, SIGNAL( "clicked()" ), SLOT( "edit_item()" ) )
 
 		@button_remove = Qt::PushButton.new( "Remove", self )
+    connect( @button_remove, SIGNAL( "clicked()" ), SLOT( "remove_clicked()" ) )
 		
     # Create vertical box for the buttons
 		vbox = Qt::VBoxLayout.new
@@ -357,9 +358,22 @@ class BrewApp < Qt::MainWindow
     @current_item = item
   end
   
+  # The add button is also used to save when in edit mode, call the correct function
+  def add_clicked
+    button = sender
+
+    if( button.text == "Add" )
+      self.add_item
+    elsif( button.text == "Save" )
+      self.save_item
+    end
+  end
+
   # TODO When the add button is clicked and boxes are not filled out an error occurs.
   # We need to display a dialog if required info is missing and be ok with non required
   # data being empty
+  # TODO We should probably only allow adding one of a certain type of grain. Whats the
+  # point of having 2 "Wheats", the ammounts could just be added to the existing one
   def add_item
     case @type
     # Send current info to controller
@@ -373,11 +387,25 @@ class BrewApp < Qt::MainWindow
       @controller.add_hops( @name, @alpha, @beta, @mass, @unit )
     when "yeast"
       @controller.add_yeast( @name, @attenuation )
-   end
+    end
+  end
+
+  def save_item
+    case @type
+    when "grain"
+      # TODO call edit grain 
+    when "hops"
+    when "yeast"
+    end
+    self.cancle_item
   end
 
   def edit_item
     if( @current_item != @grain_header && @current_item != @hops_header && @current_item != @yeast_header )
+      @button_add.text = "Save"
+      @button_remove.text = "Cancel"
+      @button_edit.setEnabled( false )
+      # TODO Disable the type combo box so the user does not do confusing things while edditng
       if( @item_list.currentRow <= @end_of_grains )
         @type_combo.setCurrentIndex( 0 )
         self.set_boxes_grain
@@ -396,6 +424,27 @@ class BrewApp < Qt::MainWindow
       end
     end
   end
+
+  def remove_clicked
+    button = sender
+
+    if( button.text == "Remove" )
+      self.remove_item
+    elsif( button.text == "Cancel" )
+      self.cancel_item
+    end
+  end
+
+  def remove_item
+    puts "remove_item()"
+  end
+
+  def cancel_item
+    @button_add.text = "Add"
+    @button_remove.text = "Cancel"
+    @button_edit.setEnabled( true )
+  end
+
 
   # Receive the updated brew data and update the GUI with it
   def brew_update b
@@ -417,8 +466,6 @@ class BrewApp < Qt::MainWindow
         @end_of_grains += 1
         @end_of_hops += 1
         @end_of_yeast += 1
-        puts "EOG: #{@end_of_grains}"
-        puts "EOH: #{@end_of_hops}"
       end
     end
 
