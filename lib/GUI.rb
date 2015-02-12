@@ -364,7 +364,11 @@ class BrewApp < Qt::MainWindow
     case @type
     # Send current info to controller
     when "grain"
-      @controller.add_grain( @name, @mass, @unit, @ppg, @efficiency )
+      if( @name != nil )
+        @controller.add_grain( @name, @mass, @unit, @ppg, @efficiency )
+      else
+        puts "Error: need a name!"
+      end
     when "hops"
       @controller.add_hops( @name, @alpha, @beta, @mass, @unit )
     when "yeast"
@@ -413,6 +417,8 @@ class BrewApp < Qt::MainWindow
         @end_of_grains += 1
         @end_of_hops += 1
         @end_of_yeast += 1
+        puts "EOG: #{@end_of_grains}"
+        puts "EOH: #{@end_of_hops}"
       end
     end
 
@@ -437,8 +443,6 @@ class BrewApp < Qt::MainWindow
       item = Qt::ListWidgetItem.new( text )
       item.setFont( @font )
       @item_list.insertItem( @end_of_yeast+1, item )
-      @end_of_grains += 1
-      @end_of_hops += 1
       @end_of_yeast += 1
     end
 

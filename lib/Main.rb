@@ -38,10 +38,16 @@ class Main
   end
 
   def add_grain( name, mass, unit, ppg, efficiency )
-    g = Grain.new( name, mass.to_f, unit, ppg.to_f, efficiency.to_f )
+    # if ppg or eff is not already nil (empty field) set it to float so we can perform math on it
+    ppg = ppg.to_f if ppg != nil
+    efficiency = efficiency.to_f if efficiency != nil
+    # if ppg or eff is 0 set it to nil so we get the defult value
+    ppg = nil if ppg == 0
+    efficiency = nil if efficiency == 0
+    g = Grain.new( name, mass.to_f, unit, ppg, efficiency )
     @brew.add_grain( g )
+    # Throw the brew back to the GUI to be displayed
     @gui.brew_update( @brew )
-    return g
   end
 
   def add_hops( name, alpha, beta, mass, unit )
