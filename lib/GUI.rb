@@ -369,18 +369,15 @@ class BrewApp < Qt::MainWindow
     end
   end
 
-  # TODO When the add button is clicked and boxes are not filled out an error occurs.
-  # We need to display a dialog if required info is missing and be ok with non required
-  # data being empty
-  # TODO We should probably only allow adding one of a certain type of grain. Whats the
-  # point of having 2 "Wheats", the ammounts could just be added to the existing one
   def add_item
     case @type
     # Send current info to controller
     when "grain"
       if( @name != nil )
+        # TODO we need a check to see if this @name already exists and display a dialog
         @controller.add_grain( @name, @mass, @unit, @ppg, @efficiency )
       else
+        # TODO Add a dialog saying that it needs a name
         puts "Error: need a name!"
       end
     when "hops"

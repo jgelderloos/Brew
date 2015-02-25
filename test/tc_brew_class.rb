@@ -318,7 +318,7 @@ class TestBrew < Test::Unit::TestCase
     assert_equal( [g], b.grains )
 
     assert_raise TypeError do
-    b.remove_grain_at(nil)
+      b.remove_grain_at(nil)
     end
   end
 
@@ -400,7 +400,7 @@ class TestBrew < Test::Unit::TestCase
 
   # Testing has_grain? --------------------------------------
 
-  def test_has_grain_good_1
+  def test_has_grain_bad_1
     # Test check for nil
     b = Brew.new("Brew")
 
@@ -412,7 +412,7 @@ class TestBrew < Test::Unit::TestCase
     assert_equal( false, b.has_grain?(nil) )
   end  
 
-  def test_has_grain_good_2
+  def test_has_grain_good_1
     # Test checking for non-existing grain
     b = Brew.new("Brew")
     g = Grain.new("Wheat")
@@ -421,7 +421,7 @@ class TestBrew < Test::Unit::TestCase
     assert_equal( false, b.has_grain?( "Barley" ) )
   end
 
-  def test_has_grain_good_3
+  def test_has_grain_good_2
     # Test checking for existing grain
     b = Brew.new("Brew")
     g = Grain.new("Barley")
@@ -471,7 +471,7 @@ class TestBrew < Test::Unit::TestCase
     # Tests passing 2 hops of the same type
     b = Brew.new("Brew")
     h = Hops.new("Simcoe")
-    h2 = Hops.new("Warrior")
+    h2 = Hops.new("Simcoe")
     b.add_hops(h)
     b.add_hops(h2)
 
@@ -714,15 +714,19 @@ class TestBrew < Test::Unit::TestCase
   
   # Testing has_hops? --------------------------------------
 
-  # TODO this should expect a bad method error since nil cant be downcased, same for grains
-  def test_has_hops_good_1
+  # TODO fix this test, also look into the same on for grains
+  def test_has_hops_bad_1
     # Test check for nil
+
     b = Brew.new("Brew")
 
-    assert_equal( false, b.has_hops?(nil) )
+    assert_raise NoMethodError do
+      b.has_hops?(nil)
+    end
+
   end  
 
-  def test_has_hops_good_2
+  def test_has_hops_good_1
     # Test checking for non-existing hops
     b = Brew.new("Brew")
     h = Hops.new("Simcoe")
@@ -731,7 +735,7 @@ class TestBrew < Test::Unit::TestCase
     assert_equal( false, b.has_hops?( "Warrior" ) )
   end
 
-  def test_has_hops_good_3
+  def test_has_hops_good_2
     # Test checking for existing hops
     b = Brew.new("Brew")
     h = Hops.new("Simcoe")
