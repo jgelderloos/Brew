@@ -443,6 +443,7 @@ class BrewApp < Qt::MainWindow
     @button_add.text = "Add"
     @button_remove.text = "Cancel"
     @button_edit.setEnabled( true )
+    # TODO Possibly clear the fields when we cancel
   end
 
 
