@@ -153,6 +153,17 @@ class TestBrew < Test::Unit::TestCase
     assert_equal( [], b.grains )
   end
 
+  def test_add_grain_bad_5
+    # Tests passing 2 grains of the same type
+    b = Brew.new("Brew")
+    g = Grain.new("Wheat")
+    g2 = Grain.new("Wheat")
+    b.add_grain(g)
+    b.add_grain(g2)
+
+    assert_equal( [g], b.grains )
+  end
+
   def test_add_grain_good_1
     # Tests passing grain
     b = Brew.new("Brew")
@@ -387,7 +398,41 @@ class TestBrew < Test::Unit::TestCase
     assert_equal( [g, g3], b.grains )
   end
 
-    # Testing adding hops --------------------------------------
+  # Testing has_grain? --------------------------------------
+
+  def test_has_grain_good_1
+    # Test check for nil
+    b = Brew.new("Brew")
+
+    assert_equal( false, b.has_grain?(nil) )
+
+    g = Grain.new("Wheat")
+    b.add_grain(g)
+
+    assert_equal( false, b.has_grain?(nil) )
+  end  
+
+  def test_has_grain_good_2
+    # Test checking for non-existing grain
+    b = Brew.new("Brew")
+    g = Grain.new("Wheat")
+    b.add_grain(g)
+
+    assert_equal( false, b.has_grain?( "Barley" ) )
+  end
+
+  def test_has_grain_good_3
+    # Test checking for existing grain
+    b = Brew.new("Brew")
+    g = Grain.new("Barley")
+    g2 = Grain.new("Wheat")
+    b.add_grain(g)
+    b.add_grain(g2)
+
+    assert_equal( true, b.has_grain?( "wheat" ) )
+  end
+
+  # Testing adding hops --------------------------------------
   
   def test_add_hops_bad_1
     # Tests passing nil
@@ -422,6 +467,17 @@ class TestBrew < Test::Unit::TestCase
     assert_equal( [], b.hops )
   end
 
+  def test_add_hops_bad_5
+    # Tests passing 2 hops of the same type
+    b = Brew.new("Brew")
+    h = Hops.new("Simcoe")
+    h2 = Hops.new("Warrior")
+    b.add_hops(h)
+    b.add_hops(h2)
+
+    assert_equal( [h], b.hops )
+  end
+  
   def test_add_hops_good_1
     # Tests passing hops
     b = Brew.new("Brew")
@@ -654,6 +710,36 @@ class TestBrew < Test::Unit::TestCase
 
     b.remove_hops_at(-2)
     assert_equal( [h, h3], b.hops )
+  end
+  
+  # Testing has_hops? --------------------------------------
+
+  # TODO this should expect a bad method error since nil cant be downcased, same for grains
+  def test_has_hops_good_1
+    # Test check for nil
+    b = Brew.new("Brew")
+
+    assert_equal( false, b.has_hops?(nil) )
+  end  
+
+  def test_has_hops_good_2
+    # Test checking for non-existing hops
+    b = Brew.new("Brew")
+    h = Hops.new("Simcoe")
+    b.add_hops(h)
+
+    assert_equal( false, b.has_hops?( "Warrior" ) )
+  end
+
+  def test_has_hops_good_3
+    # Test checking for existing hops
+    b = Brew.new("Brew")
+    h = Hops.new("Simcoe")
+    h2 = Hops.new("Warrior")
+    b.add_hops(h)
+    b.add_hops(h2)
+
+    assert_equal( true, b.has_hops?( "Simcoe" ) )
   end
 
   # Testing total_grain_mass? ---------------------------
