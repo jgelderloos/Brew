@@ -79,19 +79,29 @@ class Brew
   end
   
   def add_grain grain
-    @grains << grain if grain.is_a? Grain
+    @grains << grain if (grain.is_a? Grain) && (!self.has_grain?(grain.type))
   end
   
   def remove_grain grain
     @grains.delete(grain)
   end
-  
+ 
   def remove_grain_at index
     @grains.delete_at(index)
   end
+
+  def has_grain? type
+    ret = false
+    @grains.each do |grain|
+      if( grain.type == type.downcase )
+        ret = true
+      end
+    end
+    return ret
+  end
   
   def add_hops hops
-    @hops << hops if hops.is_a? Hops
+    @hops << hops if (hops.is_a? Hops) && (!self.has_hops?(hops.type))
   end
   
   def remove_hops hops
@@ -102,6 +112,16 @@ class Brew
     @hops.delete_at(index)
   end
   
+  def has_hops? type
+    ret = false
+    @hops.each do |hop|
+      if( hop.type == type.downcase )
+        ret = true
+      end
+    end
+    return ret
+  end
+
   # returns total grain mass in lbs
   def total_grain_mass?
     lbs_of_grain = 0
