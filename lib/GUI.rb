@@ -407,7 +407,7 @@ class BrewApp < Qt::MainWindow
       @button_add.text = "Save"
       @button_remove.text = "Cancel"
       @button_edit.setEnabled( false )
-      # TODO Disable the type combo box so the user does not do confusing things while edditng
+      @type_combo.setEnabled( false )
       # Is the current row a grain, hop, or yeast?
       # Load the data from the list item
       if( @item_list.currentRow <= @end_of_grains )
@@ -447,6 +447,10 @@ class BrewApp < Qt::MainWindow
     @button_add.text = "Add"
     @button_remove.text = "Cancel"
     @button_edit.setEnabled( true )
+    
+    # Re-enable the combo box
+    @type_combo.setEnabled( true )
+
     # Clear the text fields when we cancel
     @name_box.setText ""
     @mass_box.setText ""
