@@ -99,6 +99,17 @@ class Brew
     end
     return ret
   end
+
+  def update_grain grain
+    # If this grain already exists
+    if( self.has_grain?(grain.type) )
+      idx = @grains.index{ |x| x.type == grain.type }
+      @grains.delete_at(idx)
+      @grains.insert(idx, grain)
+    else
+      self.add_grain(grain)
+    end
+  end
   
   def add_hops hops
     @hops << hops if (hops.is_a? Hops) && (!self.has_hops?(hops.type))
@@ -122,6 +133,17 @@ class Brew
     return ret
   end
 
+  def update_hops hop
+    # If this hop already exists
+    if( self.has_hops?(hop.type) )
+      idx = @hops.index{ |x| x.type == hop.type }
+      @hops.delete_at(idx)
+      @hops.insert(idx, hop)
+    else
+      self.add_hops(hop)
+    end
+  end
+ 
   # returns total grain mass in lbs
   def total_grain_mass?
     lbs_of_grain = 0

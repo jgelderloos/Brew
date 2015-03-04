@@ -409,7 +409,10 @@ class TestBrew < Test::Unit::TestCase
     g = Grain.new("Wheat")
     b.add_grain(g)
 
-    assert_equal( false, b.has_grain?(nil) )
+    assert_raise NoMethodError do 
+      b.has_grain?(nil)
+    end
+
   end  
 
   def test_has_grain_good_1
@@ -430,6 +433,57 @@ class TestBrew < Test::Unit::TestCase
     b.add_grain(g2)
 
     assert_equal( true, b.has_grain?( "wheat" ) )
+  end
+
+  # Testing updating grain -----------------------------------
+
+  def test_update_grain_bad_1
+    # Tests passing nil
+    b = Brew.new("Brew")
+    
+    assert_raise NoMethodError do
+      b.update_grain(nil)
+    end
+
+    assert_raise NoMethodError do
+      b.update_grain("Wheat")
+    end
+  end
+
+  def test_update_grain_good_1
+    # Basic update of a grain
+    b = Brew.new("Brew")
+
+    g = Grain.new("Wheat", 12, "lbs", 30, 75)
+    b.add_grain(g)
+
+    g2 = Grain.new("wheat", 14, "lbs", 35, 70)
+    b.update_grain(g2)
+
+    assert_equal( [g2], b.grains )
+  end
+
+  def test_update_grain_good_2
+    # Test updating from default values
+    b = Brew.new("Brew")
+
+    g = Grain.new("Wheat")
+    b.add_grain(g)
+
+    g2 = Grain.new("wheat", 40, "kg", 20, 90)
+    b.update_grain(g2)
+
+    assert_equal( [g2], b.grains )
+  end
+  
+  def test_update_grain_good_3
+    # Test updating a non existing grain
+    b = Brew.new("Brew")
+
+    g = Grain.new("wheat", 12, "lbs", 20, 90)
+    b.update_grain(g)
+
+    assert_equal( [g], b.grains )
   end
 
   # Testing adding hops --------------------------------------
@@ -714,11 +768,15 @@ class TestBrew < Test::Unit::TestCase
   
   # Testing has_hops? --------------------------------------
 
-  # TODO fix this test, also look into the same on for grains
   def test_has_hops_bad_1
     # Test check for nil
 
     b = Brew.new("Brew")
+
+    assert_equal( false, b.has_hops?(nil) )
+
+    h = Hops.new("Simcoe")
+    b.add_hops(h)
 
     assert_raise NoMethodError do
       b.has_hops?(nil)
@@ -744,6 +802,57 @@ class TestBrew < Test::Unit::TestCase
     b.add_hops(h2)
 
     assert_equal( true, b.has_hops?( "Simcoe" ) )
+  end
+
+  # Testing updating hops -----------------------------------
+
+  def test_update_hops_bad_1
+    # Tests passing nil
+    b = Brew.new("Brew")
+    
+    assert_raise NoMethodError do
+      b.update_hops(nil)
+    end
+
+    assert_raise NoMethodError do
+      b.update_hops("Simcoe")
+    end
+  end
+
+  def test_update_hops_good_1
+    # Basic update of a hop
+    b = Brew.new("Brew")
+
+    h = Hops.new("Simcoe", 3.5, 4.5, 3, "oz")
+    b.add_hops(h)
+
+    h2 = Hops.new("Simcoe", 3, 4, 1, "oz")
+    b.update_hops(h2)
+
+    assert_equal( [h2], b.hops )
+  end
+
+  def test_update_hops_good_2
+    # Test updating from default values
+    b = Brew.new("Brew")
+
+    h = Hops.new("Simcoe")
+    b.add_hops(h)
+
+    h2 = Hops.new("Simcoe", 3.5, 4.5, 2, "oz")
+    b.update_hops(h2)
+
+    assert_equal( [h2], b.hops )
+  end
+  
+  def test_update_hops_good_3
+    # Test updating a non existing hop
+    b = Brew.new("Brew")
+
+    h = Hops.new("Simcoe", 1.2, 3, 2, "oz")
+    b.update_hops(h)
+
+    assert_equal( [h], b.hops )
   end
 
   # Testing total_grain_mass? ---------------------------
