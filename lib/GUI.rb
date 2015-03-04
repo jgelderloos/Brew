@@ -385,24 +385,31 @@ class BrewApp < Qt::MainWindow
     when "yeast"
       @controller.add_yeast( @name, @attenuation )
     end
+    # Cleanup the buttons and text fields
+    self.cancel_item
   end
 
   def save_item
     case @type
     when "grain"
-      # TODO call edit grain 
+      @controller.update_grain( @name, @mass, @unit, @ppg, @efficiency )
     when "hops"
     when "yeast"
     end
-    self.cancle_item
+    # Clean up the buttons and text fields
+    self.cancel_item
   end
 
   def edit_item
+    # Dont edit on the header text, that is fixed
     if( @current_item != @grain_header && @current_item != @hops_header && @current_item != @yeast_header )
+      # Update the buttons
       @button_add.text = "Save"
       @button_remove.text = "Cancel"
       @button_edit.setEnabled( false )
       # TODO Disable the type combo box so the user does not do confusing things while edditng
+      # Is the current row a grain, hop, or yeast?
+      # Load the data from the list item
       if( @item_list.currentRow <= @end_of_grains )
         @type_combo.setCurrentIndex( 0 )
         self.set_boxes_grain
@@ -440,7 +447,13 @@ class BrewApp < Qt::MainWindow
     @button_add.text = "Add"
     @button_remove.text = "Cancel"
     @button_edit.setEnabled( true )
-    # TODO Possibly clear the fields when we cancel
+    # Clear the text fields when we cancel
+    @name_box.setText ""
+    @mass_box.setText ""
+    @ppg_box.setText ""
+    @efficiency_box.setText ""
+    @alpha_box.setText ""
+    @beta_box.setText ""
   end
 
 
@@ -448,23 +461,34 @@ class BrewApp < Qt::MainWindow
   def brew_update b
     @display_brew = b
 
-    @display_brew.grains.each_with_index do |grain, index|
-      if( index+1 > @grain_strings.count )
-        text = sprintf( "%-16s| %-8.2f| %-7s| %-4d| %-11.1f|", grain.type, grain.mass, grain.unit, grain.ppg_potential, grain.percent_efficiency )
-        @grain_strings << text
+    num_grain_start = @grain_strings.count
 
-        item = Qt::ListWidgetItem.new( @grain_strings[index] )
-        item.setFont( @font )
-        item.setData( Qt::UserRole, Qt::Variant.from_value( grain.type ) )
-        item.setData( Qt::UserRole+1, Qt::Variant.from_value( grain.mass ) )
-        item.setData( Qt::UserRole+2, Qt::Variant.from_value( grain.unit ) )
-        item.setData( Qt::UserRole+3, Qt::Variant.from_value( grain.ppg_potential ) )
-        item.setData( Qt::UserRole+4, Qt::Variant.from_value( grain.percent_efficiency ) )
+    @display_brew.grains.each_with_index do |grain, index|
+      text = sprintf( "%-16s| %-8.2f| %-7s| %-4d| %-11.1f|", grain.type, grain.mass, grain.unit, grain.ppg_potential, grain.percent_efficiency )
+      @grain_strings.delete_at(index)
+      @grain_strings.insert(index, text)
+
+      # Create ListWidgetItem and store data in it
+      item = Qt::ListWidgetItem.new( @grain_strings[index] )
+      item.setFont( @font )
+      item.setData( Qt::UserRole, Qt::Variant.from_value( grain.type ) )
+      item.setData( Qt::UserRole+1, Qt::Variant.from_value( grain.mass ) )
+      item.setData( Qt::UserRole+2, Qt::Variant.from_value( grain.unit ) )
+      item.setData( Qt::UserRole+3, Qt::Variant.from_value( grain.ppg_potential ) )
+      item.setData( Qt::UserRole+4, Qt::Variant.from_value( grain.percent_efficiency ) )
+
+      # Are we updating or adding a new item?
+      if( index < num_grain_start )
+        # Remove old and replace with the new
+        test = @item_list.takeItem( @end_of_grains - (num_grain_start - index) + 1 )
+        @item_list.insertItem( @end_of_grains - (num_grain_start - index) + 1, item )
+      else
+        # Just add the new item
         @item_list.insertItem( @end_of_grains+1, item )
         @end_of_grains += 1
         @end_of_hops += 1
         @end_of_yeast += 1
-      end
+      end 
     end
 
     @display_brew.hops.each_with_index do |hops, index|
