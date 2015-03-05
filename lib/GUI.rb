@@ -404,6 +404,7 @@ class BrewApp < Qt::MainWindow
     when "hops"
       @controller.update_hops( @name, @mass, @unit, @alpha, @beta )
     when "yeast"
+      @controller.update_yeast( @name, @attenuation )
     end
     # Clean up the buttons and text fields
     self.cancel_item
@@ -424,6 +425,7 @@ class BrewApp < Qt::MainWindow
       # Load the data from the list item
       if( @item_list.currentRow <= @end_of_grains )
         @type_combo.setCurrentIndex( 0 )
+        @type = "grain"
         self.set_boxes_grain
         @name_box.setText( (@current_item.data Qt::UserRole).toString )
         @mass_box.setText( (@current_item.data Qt::UserRole+1).toString )
@@ -433,6 +435,7 @@ class BrewApp < Qt::MainWindow
         @efficiency_box.setText( (@current_item.data Qt::UserRole+4).toString )
       elsif( @item_list.currentRow <= @end_of_hops )
         @type_combo.setCurrentIndex( 1 )
+        @type = "hops"
         self.set_boxes_hops
         @name_box.setText( (@current_item.data Qt::UserRole).toString )
         @mass_box.setText( (@current_item.data Qt::UserRole+1).toString )
@@ -442,7 +445,10 @@ class BrewApp < Qt::MainWindow
         @beta_box.setText( (@current_item.data Qt::UserRole+4).toString )
       else
         @type_combo.setCurrentIndex( 2 )
+        @type = "yeast"
         self.set_boxes_yeast
+        @name_box.setText( (@current_item.data Qt::UserRole).toString )
+        @attenuation_box.setText( (@current_item.data Qt::UserRole+1).toString )  
       end
     end
   end
@@ -467,7 +473,7 @@ class BrewApp < Qt::MainWindow
       elsif( @item_list.currentRow <= @end_of_hops )
         @controller.remove_hops( @item_list.currentItem().data( Qt::UserRole ).toString() )
       else
-        puts "deleting yeast"
+        @controller.remove_yeast()
       end
     end
   end
@@ -549,13 +555,23 @@ class BrewApp < Qt::MainWindow
       @end_of_yeast += 1
     end
 
-    if( @yeast_added == false )
-      @yeast_added = true
+    # clear out the old yeast
+    if( @end_of_yeast > @end_of_hops+1 ) 
+      @item_list.takeItem( @end_of_yeast )
+      @end_of_yeast -= 1
+    end
+
+    #if( @yeast_added == false )
+    #  @yeast_added = true
+    if( @display_brew.yeast != nil )
       yeast = @display_brew.yeast
       text = sprintf( "%-16s| %-11.2f |", yeast.name , yeast.percent_attenuation )
 
       item = Qt::ListWidgetItem.new( text )
       item.setFont( @font )
+      item.setData( Qt::UserRole, Qt::Variant.from_value( yeast.name ) )
+      item.setData( Qt::UserRole+1, Qt::Variant.from_value( yeast.percent_attenuation ) )
+
       @item_list.insertItem( @end_of_yeast+1, item )
       @end_of_yeast += 1
     end

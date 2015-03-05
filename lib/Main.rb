@@ -99,7 +99,16 @@ class Main
     @gui.brew_update( @brew )
   end
 
+  def update_yeast( name, attenuation )
+    y = Yeast.new( name, attenuation.to_f )
+    @brew.yeast = y
+    @gui.brew_update( @brew )
+  end
 
+  def remove_yeast
+    @brew.yeast = nil
+    @gui.brew_update( @brew )
+  end
 
 end
 
