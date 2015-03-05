@@ -28,47 +28,47 @@ class BrewApp < Qt::MainWindow
          'on_alpha_changed(QString)', 'on_beta_changed(QString)',
          'on_attenuation_changed(QString)' )
 
-	def initialize parent = nil
-	  super( parent )
+  def initialize parent = nil
+    super( parent )
 
-		init_ui
-		
-		resize( 600, 400 )
-		move( 300, 300 )
-		
-		show
-	end
+    init_ui
+    
+    resize( 600, 400 )
+    move( 300, 300 )
+    
+    show
+  end
 	
   def set_controller c
     @controller = c
   end
 
-	def init_ui
+  def init_ui
 
     # Create tab manager as the main widget
     tab_manager = Qt::TabWidget.new self
     self.central_widget = tab_manager
     
     # Add tabs
-		ingredients_tab = Qt::Widget.new self
+    ingredients_tab = Qt::Widget.new self
     tab_manager.addTab( ingredients_tab, "Ingredients" )
 
     settings_tab = Qt::Widget.new self
     tab_manager.addTab( settings_tab, "Brew Settings" )
 
-		setWindowTitle "Brew App"
+    setWindowTitle "Brew App"
 	
     # unispaced font so the stext can form nice columns
-	  @font = Qt::Font.new()
+    @font = Qt::Font.new()
     @font.setFamily("Courier New")
 	  
     # Create the ingredients layout
-		ingredients_tab.layout = self.create_ingredients
+    ingredients_tab.layout = self.create_ingredients
 		
     # Create the settings layout
     settings_tab.layout = self.create_settings
 
-	end
+  end
 
   def create_ingredients
     hbox = Qt::HBoxLayout.new
@@ -83,13 +83,13 @@ class BrewApp < Qt::MainWindow
     button_vbox = self.create_button_vbox
    
     #hbox.addStretch( 1 )
-		hbox.addLayout( button_vbox )
+    hbox.addLayout( button_vbox )
 
     return hbox
   end
 
   def create_left_ingredients
-		# Creates the scroll area with premade headers
+    # Creates the scroll area with premade headers
     items_scroll = self.create_scroll_area 
 
     # Creates the boxes for entering new item information
@@ -440,12 +440,24 @@ class BrewApp < Qt::MainWindow
   end
 
   def remove_item
-    puts "remove_item()"
+    # Dont delete the header text, that is fixed
+    if( @current_item != @grain_header && @current_item != @hops_header && @current_item != @yeast_header )
+      # Is this a grain hops or yeast?
+      if( @item_list.currentRow <= @end_of_grains )
+        # Get the grain type from the data
+        @controller.remove_grain( @item_list.currentItem().data( Qt::UserRole ).toString() )
+        puts "deleting grain"
+      elsif( @item_list.currentRow <= @end_of_hops )
+        puts "deleting hops"
+      else
+        puts "deleting yeast"
+      end
+    end
   end
 
   def cancel_item
     @button_add.text = "Add"
-    @button_remove.text = "Cancel"
+    @button_remove.text = "Remove"
     @button_edit.setEnabled( true )
     
     # Re-enable the combo box
@@ -465,12 +477,19 @@ class BrewApp < Qt::MainWindow
   def brew_update b
     @display_brew = b
 
-    num_grain_start = @grain_strings.count
+    # Clear out the old grains
+    while( @end_of_hops > 1 )
+        @item_list.takeItem( 1 )
+        @end_of_grains -= 1
+        @end_of_hops -= 1
+        @end_of_yeast -= 1
+    end
+    @grain_strings = Array.new
 
+    # Recreate grains list
     @display_brew.grains.each_with_index do |grain, index|
       text = sprintf( "%-16s| %-8.2f| %-7s| %-4d| %-11.1f|", grain.type, grain.mass, grain.unit, grain.ppg_potential, grain.percent_efficiency )
-      @grain_strings.delete_at(index)
-      @grain_strings.insert(index, text)
+      @grain_strings << text
 
       # Create ListWidgetItem and store data in it
       item = Qt::ListWidgetItem.new( @grain_strings[index] )
@@ -481,18 +500,10 @@ class BrewApp < Qt::MainWindow
       item.setData( Qt::UserRole+3, Qt::Variant.from_value( grain.ppg_potential ) )
       item.setData( Qt::UserRole+4, Qt::Variant.from_value( grain.percent_efficiency ) )
 
-      # Are we updating or adding a new item?
-      if( index < num_grain_start )
-        # Remove old and replace with the new
-        test = @item_list.takeItem( @end_of_grains - (num_grain_start - index) + 1 )
-        @item_list.insertItem( @end_of_grains - (num_grain_start - index) + 1, item )
-      else
-        # Just add the new item
-        @item_list.insertItem( @end_of_grains+1, item )
-        @end_of_grains += 1
-        @end_of_hops += 1
-        @end_of_yeast += 1
-      end 
+      @item_list.insertItem( @end_of_grains+1, item )
+      @end_of_grains += 1
+      @end_of_hops += 1
+      @end_of_yeast += 1
     end
 
     @display_brew.hops.each_with_index do |hops, index|
@@ -522,4 +533,3 @@ class BrewApp < Qt::MainWindow
   end
   
 end
-

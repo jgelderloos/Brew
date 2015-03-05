@@ -48,8 +48,6 @@ class Main
     g = @brew.add_grain( g )
     # Throw the brew back to the GUI to be displayed
     @gui.brew_update( @brew )
-    # TODO look into removing the return, why is it here?
-    return g
   end
 
   def update_grain( name, mass, unit, ppg, efficiency )
@@ -58,6 +56,12 @@ class Main
     g = Grain.new( name, mass.to_f, unit, ppg.to_f, efficiency.to_f )
     g = @brew.update_grain( g )
     # Throw brew back to GUI
+    @gui.brew_update( @brew )
+  end
+
+  def remove_grain( name )
+    index = @brew.grains.index { |x| x.type == name }
+    @brew.remove_grain_at( index )
     @gui.brew_update( @brew )
   end
 
