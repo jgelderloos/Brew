@@ -408,6 +408,9 @@ class BrewApp < Qt::MainWindow
       @button_remove.text = "Cancel"
       @button_edit.setEnabled( false )
       @type_combo.setEnabled( false )
+      # TODO possibly make it so you can change the name, thus removing the current
+      # item and adding a different type but with the same values, for now disable it
+      @name_box.setEnabled( false )
       # Is the current row a grain, hop, or yeast?
       # Load the data from the list item
       if( @item_list.currentRow <= @end_of_grains )
@@ -460,8 +463,9 @@ class BrewApp < Qt::MainWindow
     @button_remove.text = "Remove"
     @button_edit.setEnabled( true )
     
-    # Re-enable the combo box
+    # Re-enable the combo box and name box
     @type_combo.setEnabled( true )
+    @name_box.setEnabled( true )
 
     # Clear the text fields when we cancel
     @name_box.setText ""
