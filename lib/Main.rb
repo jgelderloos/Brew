@@ -45,7 +45,7 @@ class Main
     ppg = nil if ppg == 0
     efficiency = nil if efficiency == 0
     g = Grain.new( name, mass.to_f, unit, ppg, efficiency )
-    g = @brew.add_grain( g )
+    @brew.add_grain( g )
     # Throw the brew back to the GUI to be displayed
     @gui.brew_update( @brew )
   end
@@ -54,7 +54,7 @@ class Main
     # Dont need any of the checks here like in add_grain since the loaded values will be good\
     # and anything else was the user specifically changing it
     g = Grain.new( name, mass.to_f, unit, ppg.to_f, efficiency.to_f )
-    g = @brew.update_grain( g )
+    @brew.update_grain( g )
     # Throw brew back to GUI
     @gui.brew_update( @brew )
   end
@@ -66,8 +66,30 @@ class Main
   end
 
   def add_hops( name, alpha, beta, mass, unit )
-    h = Hops.new( name, alpha.to_f, beta.to_f, mass.to_f, unit )
+    # if alpha or beta is not already nil (empty field) set it to float so we can perform math on it
+    alpha = alpha.to_f if alpha != nil
+    beta = beta.to_f if beta != nil
+    # if alpha or beta is 0 set it to nil so we get the defult value
+    alpha = nil if alpha == 0
+    beta = nil if beta == 0
+    h = Hops.new( name, alpha, beta, mass.to_f, unit )
     @brew.add_hops( h )
+    # Throw the brew back to the GUI to be displayed
+    @gui.brew_update( @brew )
+  end
+
+  def update_hops( name, mass, unit, alpha, beta )
+    # Dont need any of the checks here like in add_hops since the loaded values will be good\
+    # and anything else was the user specifically changing it
+    h = Hops.new( name, alpha.to_f, beta.to_f, mass.to_f, unit )
+    @brew.update_hops( h )
+    # Throw brew back to GUI
+    @gui.brew_update( @brew )
+  end
+
+  def remove_hops( name )
+    index = @brew.hops.index { |x| x.type == name }
+    @brew.remove_hops_at( index )
     @gui.brew_update( @brew )
   end
 

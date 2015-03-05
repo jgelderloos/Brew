@@ -374,16 +374,24 @@ class BrewApp < Qt::MainWindow
     # Send current info to controller
     when "grain"
       if( @name != nil )
-        # TODO we need a check to see if this @name already exists and display a dialog
+        # TODO For all cases we need a check to see if this @name already exists and display a dialog
         @controller.add_grain( @name, @mass, @unit, @ppg, @efficiency )
       else
-        # TODO Add a dialog saying that it needs a name
+        # TODO For all cases add a dialog saying that it needs a name
         puts "Error: need a name!"
       end
     when "hops"
-      @controller.add_hops( @name, @alpha, @beta, @mass, @unit )
+      if( @name != nil )
+        @controller.add_hops( @name, @alpha, @beta, @mass, @unit )
+      else
+        puts "Error: need a name!"
+      end
     when "yeast"
-      @controller.add_yeast( @name, @attenuation )
+      if( @name != nil )
+        @controller.add_yeast( @name, @attenuation )
+      else
+        puts "Error: need a name!"
+      end
     end
     # Cleanup the buttons and text fields
     self.cancel_item
@@ -394,6 +402,7 @@ class BrewApp < Qt::MainWindow
     when "grain"
       @controller.update_grain( @name, @mass, @unit, @ppg, @efficiency )
     when "hops"
+      @controller.update_hops( @name, @mass, @unit, @alpha, @beta )
     when "yeast"
     end
     # Clean up the buttons and text fields
@@ -424,7 +433,13 @@ class BrewApp < Qt::MainWindow
         @efficiency_box.setText( (@current_item.data Qt::UserRole+4).toString )
       elsif( @item_list.currentRow <= @end_of_hops )
         @type_combo.setCurrentIndex( 1 )
-        self.set_boxes_hops 
+        self.set_boxes_hops
+        @name_box.setText( (@current_item.data Qt::UserRole).toString )
+        @mass_box.setText( (@current_item.data Qt::UserRole+1).toString )
+        index = @unit_box.findText( (@current_item.data Qt::UserRole+2).toString, Qt::MatchFixedString )
+        @unit_box.setCurrentIndex( index )
+        @alpha_box.setText( (@current_item.data Qt::UserRole+3).toString )
+        @beta_box.setText( (@current_item.data Qt::UserRole+4).toString )
       else
         @type_combo.setCurrentIndex( 2 )
         self.set_boxes_yeast
@@ -449,9 +464,8 @@ class BrewApp < Qt::MainWindow
       if( @item_list.currentRow <= @end_of_grains )
         # Get the grain type from the data
         @controller.remove_grain( @item_list.currentItem().data( Qt::UserRole ).toString() )
-        puts "deleting grain"
       elsif( @item_list.currentRow <= @end_of_hops )
-        puts "deleting hops"
+        @controller.remove_hops( @item_list.currentItem().data( Qt::UserRole ).toString() )
       else
         puts "deleting yeast"
       end
@@ -482,7 +496,7 @@ class BrewApp < Qt::MainWindow
     @display_brew = b
 
     # Clear out the old grains
-    while( @end_of_hops > 1 )
+    while( @end_of_grains > 0 )
         @item_list.takeItem( 1 )
         @end_of_grains -= 1
         @end_of_hops -= 1
@@ -510,17 +524,29 @@ class BrewApp < Qt::MainWindow
       @end_of_yeast += 1
     end
 
-    @display_brew.hops.each_with_index do |hops, index|
-      if( index+1 > @hops_strings.count )
-        text = sprintf( "%-16s| %-8.2f| %-7s| %-8.1f| %-8.1f|", hops.type, hops.mass, hops.unit, hops.alpha, hops.beta )
-        @hops_strings << text
+    # Clear out the old hops
+    while( @end_of_hops > @end_of_grains + 1)
+        @item_list.takeItem( @end_of_grains + 2 )
+        @end_of_hops -= 1
+        @end_of_yeast -= 1
+    end
+    @hops_strings = Array.new
 
-        item = Qt::ListWidgetItem.new( @hops_strings[index] )
-        item.setFont( @font )
-        @item_list.insertItem( @end_of_hops+1, item )
-        @end_of_hops += 1
-        @end_of_yeast += 1
-      end
+    @display_brew.hops.each_with_index do |hops, index|
+      text = sprintf( "%-16s| %-8.2f| %-7s| %-8.1f| %-8.1f|", hops.type, hops.mass, hops.unit, hops.alpha, hops.beta )
+      @hops_strings << text
+
+      item = Qt::ListWidgetItem.new( @hops_strings[index] )
+      item.setFont( @font )
+      item.setData( Qt::UserRole, Qt::Variant.from_value( hops.type ) )
+      item.setData( Qt::UserRole+1, Qt::Variant.from_value( hops.mass ) )
+      item.setData( Qt::UserRole+2, Qt::Variant.from_value( hops.unit ) )
+      item.setData( Qt::UserRole+3, Qt::Variant.from_value( hops.alpha ) )
+      item.setData( Qt::UserRole+4, Qt::Variant.from_value( hops.beta ) )
+
+      @item_list.insertItem( @end_of_hops+1, item )
+      @end_of_hops += 1
+      @end_of_yeast += 1
     end
 
     if( @yeast_added == false )
