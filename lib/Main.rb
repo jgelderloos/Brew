@@ -118,6 +118,20 @@ class Main
     @gui.brew_update( @brew )
   end
 
+  def update_values( final_volume, mash_ratio, mash_ratio_loss, boil_time,
+                     trub_loss, dead_loss, rate_boil_off, shrinkage )
+    @brew.volume_final.volume = final_volume.to_f
+    @brew.ratio_mash = mash_ratio.to_f
+    @brew.ratio_mash_loss = mash_ratio_loss.to_f
+    @brew.min_boil_time = boil_time.to_f
+    @brew.volume_trub_loss.volume = trub_loss.to_f
+    @brew.volume_mash_dead_loss.volume = dead_loss.to_f
+    @brew.rate_boil_off = rate_boil_off.to_f
+    @brew.percent_shrinkage = shrinkage.to_f
+
+    @gui.brew_update( @brew )
+  end
+
 end
 
 if __FILE__ == $0

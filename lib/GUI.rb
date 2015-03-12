@@ -28,7 +28,8 @@ class BrewApp < Qt::MainWindow
          'on_alpha_changed(QString)', 'on_beta_changed(QString)',
          'on_attenuation_changed(QString)', 'on_final_volume_changed(QString)', 'on_mash_ratio_changed(QString)',
          'on_mash_ratio_loss_changed(QString)', 'on_boil_time_changed(QString)', 'on_trub_loss_changed(QString)',
-         'on_dead_loss_changed(QString)', 'on_rate_boil_off_changed(QString)', 'on_shrinkage_changed(QString)' )
+         'on_dead_loss_changed(QString)', 'on_rate_boil_off_changed(QString)', 'on_shrinkage_changed(QString)',
+         'setting_save_clicked()', 'setting_cancel_clicked()' )
 
   def initialize parent = nil
     super( parent )
@@ -203,27 +204,42 @@ class BrewApp < Qt::MainWindow
 
   def create_button_vbox
     # Create buttons and assign signals
-		@button_add = Qt::PushButton.new( "Add", self )
+    @button_add = Qt::PushButton.new( "Add", self )
     connect( @button_add, SIGNAL( "clicked()" ), SLOT( "add_clicked()" ) )
     
-		@button_edit = Qt::PushButton.new( "Edit", self )
+    @button_edit = Qt::PushButton.new( "Edit", self )
     connect( @button_edit, SIGNAL( "clicked()" ), SLOT( "edit_item()" ) )
 
-		@button_remove = Qt::PushButton.new( "Remove", self )
+    @button_remove = Qt::PushButton.new( "Remove", self )
     connect( @button_remove, SIGNAL( "clicked()" ), SLOT( "remove_clicked()" ) )
 		
     # Create vertical box for the buttons
-		vbox = Qt::VBoxLayout.new
-		
-		vbox.addStretch( 1 )
-		vbox.addWidget( @button_add )
-		vbox.addWidget( @button_edit )
-		vbox.addWidget( @button_remove )
+    vbox = Qt::VBoxLayout.new
+    		
+    vbox.addStretch( 1 )
+    vbox.addWidget( @button_add )
+    vbox.addWidget( @button_edit )
+    vbox.addWidget( @button_remove )
 
     return vbox
   end
 
   def create_settings
+    hbox = Qt::HBoxLayout.new
+
+    # Create left grid that holds values from the brew
+    left_grid = self.create_setting_left_grid
+
+    hbox.addLayout( left_grid )
+
+    right_buttons = self.create_setting_button_vbox
+
+    hbox.addLayout( right_buttons )
+
+    return hbox
+  end
+
+  def create_setting_left_grid
     grid_settings = Qt::GridLayout.new
 
     final_volume_label = Qt::Label.new( "Final Volume (gal)", self )
@@ -279,6 +295,26 @@ class BrewApp < Qt::MainWindow
     grid_settings.setColumnStretch( 4, 1 )
 
     return grid_settings
+  end
+
+  def create_setting_button_vbox
+    # Create buttons and assign signals
+    @setting_button_save = Qt::PushButton.new( "Save", self )
+    connect( @setting_button_save, SIGNAL( "clicked()" ), SLOT( "setting_save_clicked()" ) )
+    @setting_button_save.setEnabled( false )
+
+    @setting_button_cancel = Qt::PushButton.new( "Cancel", self )
+    connect( @setting_button_cancel, SIGNAL( "clicked()" ), SLOT( "setting_cancel_clicked()" ) )
+    @setting_button_cancel.setEnabled( false )
+
+    # Create vertical box for the buttons
+    vbox = Qt::VBoxLayout.new
+    		
+    vbox.addStretch( 1 )
+    vbox.addWidget( @setting_button_save )
+    vbox.addWidget( @setting_button_cancel )
+
+    return vbox
   end
 
   # Controls the hidding and showing of boxes based on the combo
@@ -372,34 +408,50 @@ class BrewApp < Qt::MainWindow
 
   def on_final_volume_changed vol
     @final_volume = vol
+    @setting_button_save.setEnabled( true )
+    @setting_button_cancel.setEnabled( true )
   end
 
   def on_mash_ratio_changed ratio
     @mash_ratio = ratio
+    @setting_button_save.setEnabled( true )
+    @setting_button_cancel.setEnabled( true )
   end
 
   def on_mash_ratio_loss_changed ratio
     @mash_ratio_loss = ratio
+    @setting_button_save.setEnabled( true )
+    @setting_button_cancel.setEnabled( true )
   end
 
   def on_boil_time_changed time
     @boil_time = time
+    @setting_button_save.setEnabled( true )
+    @setting_button_cancel.setEnabled( true )
   end
 
   def on_trub_loss_changed loss
     @trub_loss = loss
+    @setting_button_save.setEnabled( true )
+    @setting_button_cancel.setEnabled( true )
   end
 
   def on_dead_loss_changed loss
     @dead_loss = loss
+    @setting_button_save.setEnabled( true )
+    @setting_button_cancel.setEnabled( true )
   end
 
   def on_rate_boil_off_changed rate
     @rate_boil_off = rate
+    @setting_button_save.setEnabled( true )
+    @setting_button_cancel.setEnabled( true )
   end
 
   def on_shrinkage_changed shrink
     @shrinkage = shrink
+    @setting_button_save.setEnabled( true )
+    @setting_button_cancel.setEnabled( true )
   end
 
   # Set the curently highlighted item 
@@ -548,6 +600,39 @@ class BrewApp < Qt::MainWindow
     @attenuation_box.setText ""
   end
 
+  def setting_save_clicked
+    @controller.update_values( @final_volume, @mash_ratio, @mash_ratio_loss, @boil_time,
+                               @trub_loss, @dead_loss, @rate_boil_off, @shrinkage )
+  end
+
+  def setting_cancel_clicked
+    @final_volume = @old_final_volume
+    @final_volume_box.setText( @final_volume.to_s )
+
+    @mash_ratio = @old_mash_ratio
+    @mash_ratio_box.setText( @mash_ratio.to_s )
+
+    @mash_ratio_loss = @old_mash_ratio_loss
+    @mash_ratio_loss_box.setText( @mash_ratio_loss.to_s )
+
+    @boil_time = @old_boil_time
+    @boil_time_box.setText( @boil_time.to_s )
+
+    @trub_loss = @old_trub_loss
+    @trub_loss_box.setText( @trub_loss.to_s )
+
+    @dead_loss = @old_dead_loss
+    @dead_loss_box.setText( @dead_loss.to_s )
+
+    @rate_boil_off = @old_rate_boil_off
+    @rate_boil_off_box.setText( @rate_boil_off.to_s )
+
+    @shrinkage = @old_shrinkage
+    @shrinkage_box.setText( @shrinkage.to_s )
+
+    @setting_button_save.setEnabled( false )
+    @setting_button_cancel.setEnabled( false )
+  end
 
   # Receive the updated brew data and update the GUI with it
   def brew_update b
@@ -627,29 +712,33 @@ class BrewApp < Qt::MainWindow
     end
 
     # Update items in settings tabs
-    @final_volume = @display_brew.volume_final.volume.to_f
+    @final_volume = @old_final_volume = @display_brew.volume_final.volume.to_f
     @final_volume_box.setText( @final_volume.to_s )
 
-    @mash_ratio = @display_brew.ratio_mash
+    @mash_ratio = @old_mash_ratio = @display_brew.ratio_mash
     @mash_ratio_box.setText( @mash_ratio.to_s )
 
-    @mash_ratio_loss = @display_brew.ratio_mash_loss
+    @mash_ratio_loss = @old_mash_ratio_loss = @display_brew.ratio_mash_loss
     @mash_ratio_loss_box.setText( @mash_ratio_loss.to_s )
 
-    @boil_time = @display_brew.min_boil_time
+    @boil_time = @old_boil_time = @display_brew.min_boil_time
     @boil_time_box.setText( @boil_time.to_s )
 
-    @trub_loss = @display_brew.volume_trub_loss.volume.to_f
+    @trub_loss = @old_trub_loss = @display_brew.volume_trub_loss.volume.to_f
     @trub_loss_box.setText( @trub_loss.to_s )
 
-    @dead_loss = @display_brew.volume_mash_dead_loss.volume.to_f
+    @dead_loss = @old_dead_loss = @display_brew.volume_mash_dead_loss.volume.to_f
     @dead_loss_box.setText( @dead_loss.to_s )
 
-    @rate_boil_off = @display_brew.rate_boil_off
+    @rate_boil_off = @old_rate_boil_off = @display_brew.rate_boil_off
     @rate_boil_off_box.setText( @rate_boil_off.to_s )
 
-    @shrinkage = @display_brew.percent_shrinkage
+    @shrinkage = @old_shrinkage = @display_brew.percent_shrinkage
     @shrinkage_box.setText( @shrinkage.to_s )
+
+    # Make sure the buttons are disabled after updating
+    @setting_button_save.setEnabled( false )
+    @setting_button_cancel.setEnabled( false )
   end
   
 end
