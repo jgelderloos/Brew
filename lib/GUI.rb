@@ -26,7 +26,9 @@ class BrewApp < Qt::MainWindow
   slots( 'item_clicked(QListWidgetItem*)', 'add_clicked()', 'edit_item()', 'remove_clicked()', 'on_activated(QString)', 'on_name_changed(QString)', 
          'on_mass_changed(QString)', 'on_unit_activated(QString)', 'on_ppg_changed(QString)', 'on_efficiency_changed(QString)', 
          'on_alpha_changed(QString)', 'on_beta_changed(QString)',
-         'on_attenuation_changed(QString)' )
+         'on_attenuation_changed(QString)', 'on_final_volume_changed(QString)', 'on_mash_ratio_changed(QString)',
+         'on_mash_ratio_loss_changed(QString)', 'on_boil_time_changed(QString)', 'on_trub_loss_changed(QString)',
+         'on_dead_loss_changed(QString)', 'on_rate_boil_off_changed(QString)', 'on_shrinkage_changed(QString)' )
 
   def initialize parent = nil
     super( parent )
@@ -224,40 +226,55 @@ class BrewApp < Qt::MainWindow
   def create_settings
     grid_settings = Qt::GridLayout.new
 
-    final_volume_label = Qt::Label.new( "Final Volume", self )
-    final_volume = Qt::LineEdit.new self
-    mash_ratio_label = Qt::Label.new( "Mash Ratio", self )
-    mash_ratio = Qt::LineEdit.new self
-    mash_ratio_loss_label = Qt::Label.new( "Mash Loss Ratio", self )
-    mash_ratio_loss = Qt::LineEdit.new self
-    boil_time_label = Qt::Label.new( "Boil Time", self )
-    boil_time = Qt::LineEdit.new self
-    trub_loss_label = Qt::Label.new( "Trub Loss", self )
-    trub_loss = Qt::LineEdit.new self
-    dead_loss_label = Qt::Label.new( "Dead Loss", self )
-    dead_loss = Qt::LineEdit.new self
-    rate_boil_off_label = Qt::Label.new( "Rate Boil Off", self )
-    rate_boil_off = Qt::LineEdit.new self
-    shrinkage_label = Qt::Label.new( "Shrinkage", self )
-    shrinkage = Qt::LineEdit.new self
+    final_volume_label = Qt::Label.new( "Final Volume (gal)", self )
+    @final_volume_box = Qt::LineEdit.new self
+    connect( @final_volume_box, SIGNAL( "textChanged(QString)" ), self, SLOT("on_final_volume_changed(QString)") )
+
+    mash_ratio_label = Qt::Label.new( "Mash Ratio (qts/lb)", self )
+    @mash_ratio_box = Qt::LineEdit.new self
+    connect( @mash_ratio_box, SIGNAL( "textChanged(QString)" ), self, SLOT("on_mash_ratio_changed(QString)") )
+
+    mash_ratio_loss_label = Qt::Label.new( "Mash Loss Ratio (qts/lb)", self )
+    @mash_ratio_loss_box = Qt::LineEdit.new self
+    connect( @mash_ratio_loss_box, SIGNAL( "textChanged(QString)" ), self, SLOT("on_mash_ratio_loss_changed(QString)") )
+
+    boil_time_label = Qt::Label.new( "Boil Time (min)", self )
+    @boil_time_box = Qt::LineEdit.new self
+    connect( @boil_time_box, SIGNAL( "textChanged(QString)" ), self, SLOT("on_boil_time_changed(QString)") )
+
+    trub_loss_label = Qt::Label.new( "Trub Loss (gal)", self )
+    @trub_loss_box = Qt::LineEdit.new self
+    connect( @trub_loss_box, SIGNAL( "textChanged(QString)" ), self, SLOT("on_trub_loss_changed(QString)") )
+
+    dead_loss_label = Qt::Label.new( "Dead Loss (gal)", self )
+    @dead_loss_box = Qt::LineEdit.new self
+    connect( @dead_loss_box, SIGNAL( "textChanged(QString)" ), self, SLOT("on_dead_loss_changed(QString)") )
+
+    rate_boil_off_label = Qt::Label.new( "Rate Boil Off (gal/hr)", self )
+    @rate_boil_off_box = Qt::LineEdit.new self
+    connect( @rate_boil_off_box, SIGNAL( "textChanged(QString)" ), self, SLOT("on_rate_boil_off_changed(QString)") )
+
+    shrinkage_label = Qt::Label.new( "Shrinkage (%)", self )
+    @shrinkage_box = Qt::LineEdit.new self
+    connect( @shrinkage_box, SIGNAL( "textChanged(QString)" ), self, SLOT("on_shrinkage_changed(QString)") )
 
 
     grid_settings.addWidget( final_volume_label, 0, 0 )
-    grid_settings.addWidget( final_volume, 0, 1, 1, 3 )
+    grid_settings.addWidget( @final_volume_box, 0, 1, 1, 3 )
     grid_settings.addWidget( mash_ratio_label, 1, 0 )
-    grid_settings.addWidget( mash_ratio, 1, 1, 1, 3 )
+    grid_settings.addWidget( @mash_ratio_box, 1, 1, 1, 3 )
     grid_settings.addWidget( mash_ratio_loss_label, 2, 0 )
-    grid_settings.addWidget( mash_ratio_loss, 2, 1, 1, 3 )
+    grid_settings.addWidget( @mash_ratio_loss_box, 2, 1, 1, 3 )
     grid_settings.addWidget( boil_time_label, 3, 0 )
-    grid_settings.addWidget( boil_time, 3, 1, 1, 3 )
+    grid_settings.addWidget( @boil_time_box, 3, 1, 1, 3 )
     grid_settings.addWidget( trub_loss_label, 4, 0 )
-    grid_settings.addWidget( trub_loss, 4, 1, 1, 3 )
+    grid_settings.addWidget( @trub_loss_box, 4, 1, 1, 3 )
     grid_settings.addWidget( dead_loss_label, 5, 0 )
-    grid_settings.addWidget( dead_loss, 5, 1, 1, 3 )
+    grid_settings.addWidget( @dead_loss_box, 5, 1, 1, 3 )
     grid_settings.addWidget( rate_boil_off_label, 6, 0 )
-    grid_settings.addWidget( rate_boil_off, 6, 1, 1, 3 )
+    grid_settings.addWidget( @rate_boil_off_box, 6, 1, 1, 3 )
     grid_settings.addWidget( shrinkage_label, 7, 0 )
-    grid_settings.addWidget( shrinkage, 7, 1, 1, 3 )    
+    grid_settings.addWidget( @shrinkage_box, 7, 1, 1, 3 )    
     grid_settings.setRowStretch( 8, 1 )
     grid_settings.setColumnStretch( 4, 1 )
 
@@ -351,6 +368,38 @@ class BrewApp < Qt::MainWindow
 
   def on_attenuation_changed att
     @attenuation = att
+  end
+
+  def on_final_volume_changed vol
+    @final_volume = vol
+  end
+
+  def on_mash_ratio_changed ratio
+    @mash_ratio = ratio
+  end
+
+  def on_mash_ratio_loss_changed ratio
+    @mash_ratio_loss = ratio
+  end
+
+  def on_boil_time_changed time
+    @boil_time = time
+  end
+
+  def on_trub_loss_changed loss
+    @trub_loss = loss
+  end
+
+  def on_dead_loss_changed loss
+    @dead_loss = loss
+  end
+
+  def on_rate_boil_off_changed rate
+    @rate_boil_off = rate
+  end
+
+  def on_shrinkage_changed shrink
+    @shrinkage = shrink
   end
 
   # Set the curently highlighted item 
@@ -564,8 +613,6 @@ class BrewApp < Qt::MainWindow
       @end_of_yeast -= 1
     end
 
-    #if( @yeast_added == false )
-    #  @yeast_added = true
     if( @display_brew.yeast != nil )
       yeast = @display_brew.yeast
       text = sprintf( "%-16s| %-11.2f |", yeast.name , yeast.percent_attenuation )
@@ -579,6 +626,30 @@ class BrewApp < Qt::MainWindow
       @end_of_yeast += 1
     end
 
+    # Update items in settings tabs
+    @final_volume = @display_brew.volume_final.volume.to_f
+    @final_volume_box.setText( @final_volume.to_s )
+
+    @mash_ratio = @display_brew.ratio_mash
+    @mash_ratio_box.setText( @mash_ratio.to_s )
+
+    @mash_ratio_loss = @display_brew.ratio_mash_loss
+    @mash_ratio_loss_box.setText( @mash_ratio_loss.to_s )
+
+    @boil_time = @display_brew.min_boil_time
+    @boil_time_box.setText( @boil_time.to_s )
+
+    @trub_loss = @display_brew.volume_trub_loss.volume.to_f
+    @trub_loss_box.setText( @trub_loss.to_s )
+
+    @dead_loss = @display_brew.volume_mash_dead_loss.volume.to_f
+    @dead_loss_box.setText( @dead_loss.to_s )
+
+    @rate_boil_off = @display_brew.rate_boil_off
+    @rate_boil_off_box.setText( @rate_boil_off.to_s )
+
+    @shrinkage = @display_brew.percent_shrinkage
+    @shrinkage_box.setText( @shrinkage.to_s )
   end
   
 end

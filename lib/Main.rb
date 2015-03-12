@@ -33,6 +33,9 @@ class Main
     @gui = BrewApp.new
     @gui.set_controller self
 
+    # Send initial brew for gui init
+    @gui.brew_update( @brew )
+
     app.exec()
 
   end
