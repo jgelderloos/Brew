@@ -35,8 +35,7 @@ class TestBrew < Test::Unit::TestCase
     assert_equal( "", b.name )
     assert_equal( [], b.grains )
     assert_equal( [], b.hops )
-    assert_equal( "Yeast name", b.yeast.name )
-    assert_equal( 75, b.yeast.percent_attenuation )
+    assert_equal( nil, b.yeast )
     assert_equal( 0, b.lbs_grain_total )
     assert_equal( 0, b.volume_mash.volume )
     assert_equal( 1.5, b.ratio_mash )
@@ -65,8 +64,7 @@ class TestBrew < Test::Unit::TestCase
     assert_equal( "My Brew", b.name )
     assert_equal( [], b.grains )
     assert_equal( [], b.hops )
-    assert_equal( "Yeast name", b.yeast.name )
-    assert_equal( 75, b.yeast.percent_attenuation )
+    assert_equal( nil, b.yeast )
     assert_equal( 0, b.lbs_grain_total )
     assert_equal( 0, b.volume_mash.volume )
     assert_equal( 1.5, b.ratio_mash )
@@ -95,8 +93,7 @@ class TestBrew < Test::Unit::TestCase
     assert_equal( "", b.name )
     assert_equal( [], b.grains )
     assert_equal( [], b.hops )
-    assert_equal( "Yeast name", b.yeast.name )
-    assert_equal( 75, b.yeast.percent_attenuation )
+    assert_equal( nil, b.yeast )
     assert_equal( 0, b.lbs_grain_total )
     assert_equal( 0, b.volume_mash.volume )
     assert_equal( 1.5, b.ratio_mash )
@@ -1466,6 +1463,8 @@ class TestBrew < Test::Unit::TestCase
   def test_calc_gravity_final_good_1
     # Tests with all values at 0
     b = Brew.new("Brew")
+    y = Yeast.new( "Yeast", 75 )
+    b.yeast = y
 
     assert_equal( 1, b.calc_gravity_final )
     assert_equal( 1, b.gravity_final )
@@ -1474,6 +1473,8 @@ class TestBrew < Test::Unit::TestCase
   def test_calc_gravity_final_good_2
     # Tests with original gravity
     b = Brew.new("Brew")
+    y = Yeast.new( "Yeast", 75 )
+    b.yeast = y
     g = Grain.new("wheat", 13, "lbs", 45, 75 )
     b.add_grain(g)
     b.volume_final.volume = 5
@@ -1487,6 +1488,8 @@ class TestBrew < Test::Unit::TestCase
   def test_calc_gravity_final_good_3
     # Tests with different yeast value
     b = Brew.new("Brew")
+    y = Yeast.new( "Yeast", 75 )
+    b.yeast = y
     g = Grain.new("wheat", 13, "lbs", 45, 75 )
     b.add_grain(g)
     b.volume_final.volume = 5
@@ -1501,6 +1504,8 @@ class TestBrew < Test::Unit::TestCase
   def test_bang_calc_gravity_final_good_1
     # Tests ! version changes brew
     b = Brew.new("Brew")
+    y = Yeast.new( "Yeast", 75 )
+    b.yeast = y
     g = Grain.new("wheat", 13, "lbs", 45, 75 )
     b.add_grain(g)
     b.volume_final.volume = 5

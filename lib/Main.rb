@@ -94,9 +94,14 @@ class Main
   end
 
   def add_yeast( name, attenuation )
-    y = Yeast.new( name, attenuation.to_f )
-    @brew.yeast = y
-    @gui.brew_update( @brew )
+    # Only add a new yeast if there is not one that already exists
+    if( @brew.yeast == nil )
+      attenuation = attenuation.to_f if attenuation != nil
+      attenuation = nil if attenuation == 0
+      y = Yeast.new( name, attenuation )
+      @brew.yeast = y
+      @gui.brew_update( @brew )
+    end
   end
 
   def update_yeast( name, attenuation )

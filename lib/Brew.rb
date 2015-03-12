@@ -56,7 +56,7 @@ class Brew
     @name = name.to_s
     @grains = []
     @hops = []
-    @yeast = Yeast.new("Yeast name")
+    @yeast = nil 
     @lbs_grain_total = 0
     @volume_mash = Water.new
     @ratio_mash = 1.5 # qts/lbs

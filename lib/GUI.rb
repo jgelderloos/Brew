@@ -444,6 +444,8 @@ class BrewApp < Qt::MainWindow
         @alpha_box.setText( (@current_item.data Qt::UserRole+3).toString )
         @beta_box.setText( (@current_item.data Qt::UserRole+4).toString )
       else
+        # Allowing name change for yeast since its so simple
+        @name_box.setEnabled( true )
         @type_combo.setCurrentIndex( 2 )
         @type = "yeast"
         self.set_boxes_yeast
@@ -494,6 +496,7 @@ class BrewApp < Qt::MainWindow
     @efficiency_box.setText ""
     @alpha_box.setText ""
     @beta_box.setText ""
+    @attenuation_box.setText ""
   end
 
 
