@@ -38,13 +38,6 @@ class TestYeast < Test::Unit::TestCase
       y = Yeast.new( "My Yeast", "ten" )
     end
   end
-  
-  def test_init_bad_attenuation_2
-    # Test passing nil
-    assert_raise NoMethodError do
-      y = Yeast.new( "My Yeast", nil )
-    end
-  end
 
   # Testing valid inputs -----------------------------------------------
 
@@ -80,6 +73,13 @@ class TestYeast < Test::Unit::TestCase
     assert_equal( 82.3, y.percent_attenuation )
   end
 
+  def test_init_good_attenuation_3
+    # Test passing nil
+    y = Yeast.new( "My Yeast", nil )
+
+    assert_equal( "My Yeast", y.name )
+    assert_equal( 75, y.percent_attenuation )
+  end
   # Testing setters ----------------------------------------------
 
   def test_set_attenuation_bad_1

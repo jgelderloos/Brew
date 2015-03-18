@@ -23,6 +23,7 @@ class Yeast
   
   def initialize name, attenuation = 75
     @name = name.to_s
+    attenuation = 75 if attenuation == nil
     set_attenuation( attenuation )
   end
    

@@ -35,8 +35,7 @@ class TestBrew < Test::Unit::TestCase
     assert_equal( "", b.name )
     assert_equal( [], b.grains )
     assert_equal( [], b.hops )
-    assert_equal( "Yeast name", b.yeast.name )
-    assert_equal( 75, b.yeast.percent_attenuation )
+    assert_equal( nil, b.yeast )
     assert_equal( 0, b.lbs_grain_total )
     assert_equal( 0, b.volume_mash.volume )
     assert_equal( 1.5, b.ratio_mash )
@@ -65,8 +64,7 @@ class TestBrew < Test::Unit::TestCase
     assert_equal( "My Brew", b.name )
     assert_equal( [], b.grains )
     assert_equal( [], b.hops )
-    assert_equal( "Yeast name", b.yeast.name )
-    assert_equal( 75, b.yeast.percent_attenuation )
+    assert_equal( nil, b.yeast )
     assert_equal( 0, b.lbs_grain_total )
     assert_equal( 0, b.volume_mash.volume )
     assert_equal( 1.5, b.ratio_mash )
@@ -95,8 +93,7 @@ class TestBrew < Test::Unit::TestCase
     assert_equal( "", b.name )
     assert_equal( [], b.grains )
     assert_equal( [], b.hops )
-    assert_equal( "Yeast name", b.yeast.name )
-    assert_equal( 75, b.yeast.percent_attenuation )
+    assert_equal( nil, b.yeast )
     assert_equal( 0, b.lbs_grain_total )
     assert_equal( 0, b.volume_mash.volume )
     assert_equal( 1.5, b.ratio_mash )
@@ -318,7 +315,7 @@ class TestBrew < Test::Unit::TestCase
     assert_equal( [g], b.grains )
 
     assert_raise TypeError do
-    b.remove_grain_at(nil)
+      b.remove_grain_at(nil)
     end
   end
 
@@ -400,7 +397,7 @@ class TestBrew < Test::Unit::TestCase
 
   # Testing has_grain? --------------------------------------
 
-  def test_has_grain_good_1
+  def test_has_grain_bad_1
     # Test check for nil
     b = Brew.new("Brew")
 
@@ -409,10 +406,13 @@ class TestBrew < Test::Unit::TestCase
     g = Grain.new("Wheat")
     b.add_grain(g)
 
-    assert_equal( false, b.has_grain?(nil) )
+    assert_raise NoMethodError do 
+      b.has_grain?(nil)
+    end
+
   end  
 
-  def test_has_grain_good_2
+  def test_has_grain_good_1
     # Test checking for non-existing grain
     b = Brew.new("Brew")
     g = Grain.new("Wheat")
@@ -421,7 +421,7 @@ class TestBrew < Test::Unit::TestCase
     assert_equal( false, b.has_grain?( "Barley" ) )
   end
 
-  def test_has_grain_good_3
+  def test_has_grain_good_2
     # Test checking for existing grain
     b = Brew.new("Brew")
     g = Grain.new("Barley")
@@ -430,6 +430,57 @@ class TestBrew < Test::Unit::TestCase
     b.add_grain(g2)
 
     assert_equal( true, b.has_grain?( "wheat" ) )
+  end
+
+  # Testing updating grain -----------------------------------
+
+  def test_update_grain_bad_1
+    # Tests passing nil
+    b = Brew.new("Brew")
+    
+    assert_raise NoMethodError do
+      b.update_grain(nil)
+    end
+
+    assert_raise NoMethodError do
+      b.update_grain("Wheat")
+    end
+  end
+
+  def test_update_grain_good_1
+    # Basic update of a grain
+    b = Brew.new("Brew")
+
+    g = Grain.new("Wheat", 12, "lbs", 30, 75)
+    b.add_grain(g)
+
+    g2 = Grain.new("wheat", 14, "lbs", 35, 70)
+    b.update_grain(g2)
+
+    assert_equal( [g2], b.grains )
+  end
+
+  def test_update_grain_good_2
+    # Test updating from default values
+    b = Brew.new("Brew")
+
+    g = Grain.new("Wheat")
+    b.add_grain(g)
+
+    g2 = Grain.new("wheat", 40, "kg", 20, 90)
+    b.update_grain(g2)
+
+    assert_equal( [g2], b.grains )
+  end
+  
+  def test_update_grain_good_3
+    # Test updating a non existing grain
+    b = Brew.new("Brew")
+
+    g = Grain.new("wheat", 12, "lbs", 20, 90)
+    b.update_grain(g)
+
+    assert_equal( [g], b.grains )
   end
 
   # Testing adding hops --------------------------------------
@@ -471,7 +522,7 @@ class TestBrew < Test::Unit::TestCase
     # Tests passing 2 hops of the same type
     b = Brew.new("Brew")
     h = Hops.new("Simcoe")
-    h2 = Hops.new("Warrior")
+    h2 = Hops.new("Simcoe")
     b.add_hops(h)
     b.add_hops(h2)
 
@@ -714,15 +765,23 @@ class TestBrew < Test::Unit::TestCase
   
   # Testing has_hops? --------------------------------------
 
-  # TODO this should expect a bad method error since nil cant be downcased, same for grains
-  def test_has_hops_good_1
+  def test_has_hops_bad_1
     # Test check for nil
+
     b = Brew.new("Brew")
 
     assert_equal( false, b.has_hops?(nil) )
+
+    h = Hops.new("Simcoe")
+    b.add_hops(h)
+
+    assert_raise NoMethodError do
+      b.has_hops?(nil)
+    end
+
   end  
 
-  def test_has_hops_good_2
+  def test_has_hops_good_1
     # Test checking for non-existing hops
     b = Brew.new("Brew")
     h = Hops.new("Simcoe")
@@ -731,7 +790,7 @@ class TestBrew < Test::Unit::TestCase
     assert_equal( false, b.has_hops?( "Warrior" ) )
   end
 
-  def test_has_hops_good_3
+  def test_has_hops_good_2
     # Test checking for existing hops
     b = Brew.new("Brew")
     h = Hops.new("Simcoe")
@@ -740,6 +799,57 @@ class TestBrew < Test::Unit::TestCase
     b.add_hops(h2)
 
     assert_equal( true, b.has_hops?( "Simcoe" ) )
+  end
+
+  # Testing updating hops -----------------------------------
+
+  def test_update_hops_bad_1
+    # Tests passing nil
+    b = Brew.new("Brew")
+    
+    assert_raise NoMethodError do
+      b.update_hops(nil)
+    end
+
+    assert_raise NoMethodError do
+      b.update_hops("Simcoe")
+    end
+  end
+
+  def test_update_hops_good_1
+    # Basic update of a hop
+    b = Brew.new("Brew")
+
+    h = Hops.new("Simcoe", 3.5, 4.5, 3, "oz")
+    b.add_hops(h)
+
+    h2 = Hops.new("Simcoe", 3, 4, 1, "oz")
+    b.update_hops(h2)
+
+    assert_equal( [h2], b.hops )
+  end
+
+  def test_update_hops_good_2
+    # Test updating from default values
+    b = Brew.new("Brew")
+
+    h = Hops.new("Simcoe")
+    b.add_hops(h)
+
+    h2 = Hops.new("Simcoe", 3.5, 4.5, 2, "oz")
+    b.update_hops(h2)
+
+    assert_equal( [h2], b.hops )
+  end
+  
+  def test_update_hops_good_3
+    # Test updating a non existing hop
+    b = Brew.new("Brew")
+
+    h = Hops.new("Simcoe", 1.2, 3, 2, "oz")
+    b.update_hops(h)
+
+    assert_equal( [h], b.hops )
   end
 
   # Testing total_grain_mass? ---------------------------
@@ -1353,6 +1463,8 @@ class TestBrew < Test::Unit::TestCase
   def test_calc_gravity_final_good_1
     # Tests with all values at 0
     b = Brew.new("Brew")
+    y = Yeast.new( "Yeast", 75 )
+    b.yeast = y
 
     assert_equal( 1, b.calc_gravity_final )
     assert_equal( 1, b.gravity_final )
@@ -1361,6 +1473,8 @@ class TestBrew < Test::Unit::TestCase
   def test_calc_gravity_final_good_2
     # Tests with original gravity
     b = Brew.new("Brew")
+    y = Yeast.new( "Yeast", 75 )
+    b.yeast = y
     g = Grain.new("wheat", 13, "lbs", 45, 75 )
     b.add_grain(g)
     b.volume_final.volume = 5
@@ -1374,6 +1488,8 @@ class TestBrew < Test::Unit::TestCase
   def test_calc_gravity_final_good_3
     # Tests with different yeast value
     b = Brew.new("Brew")
+    y = Yeast.new( "Yeast", 75 )
+    b.yeast = y
     g = Grain.new("wheat", 13, "lbs", 45, 75 )
     b.add_grain(g)
     b.volume_final.volume = 5
@@ -1388,6 +1504,8 @@ class TestBrew < Test::Unit::TestCase
   def test_bang_calc_gravity_final_good_1
     # Tests ! version changes brew
     b = Brew.new("Brew")
+    y = Yeast.new( "Yeast", 75 )
+    b.yeast = y
     g = Grain.new("wheat", 13, "lbs", 45, 75 )
     b.add_grain(g)
     b.volume_final.volume = 5
