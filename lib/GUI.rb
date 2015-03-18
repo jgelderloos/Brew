@@ -510,28 +510,51 @@ class BrewApp < Qt::MainWindow
     end
   end
 
+  def show_dialog type
+    case type
+    when :duplicate
+      Qt::MessageBox.warning( self, "Warning", "An ingredient of that name already exists!" )
+    when :empty
+      Qt::MessageBox.warning( self, "Warning", "Please enter a name" )
+    when :yeast
+      Qt::MessageBox.warning( self, "Warning", "Only one yeast per recipe!" )
+    else
+      Qt::MessageBox.warning( self, "Error", "Error" )
+    end
+  end
+
   def add_item
     case @type
     # Send current info to controller
     when "grain"
       if( @name != nil )
-        # TODO For all cases we need a check to see if this @name already exists and display a dialog
-        @controller.add_grain( @name, @mass, @unit, @ppg, @efficiency )
+        if( @display_brew.has_grain?( @name ) )
+          self.show_dialog( :duplicate ) 
+        else
+          @controller.add_grain( @name, @mass, @unit, @ppg, @efficiency )
+        end
       else
-        # TODO For all cases add a dialog saying that it needs a name
-        puts "Error: need a name!"
+        self.show_dialog( :empty ) 
       end
     when "hops"
       if( @name != nil )
-        @controller.add_hops( @name, @alpha, @beta, @mass, @unit )
+        if( @display_brew.has_hops?( @name ) )
+          self.show_dialog( :duplicate ) 
+        else
+          @controller.add_hops( @name, @alpha, @beta, @mass, @unit )
+        end
       else
-        puts "Error: need a name!"
+        self.show_dialog( :empty ) 
       end
     when "yeast"
       if( @name != nil )
-        @controller.add_yeast( @name, @attenuation )
+        if( @display_brew.yeast != nil )
+          self.show_dialog( :yeast )
+        else
+          @controller.add_yeast( @name, @attenuation )
+        end
       else
-        puts "Error: need a name!"
+        self.show_dialog( :empty ) 
       end
     end
     # Cleanup the buttons and text fields
