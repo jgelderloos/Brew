@@ -49,6 +49,8 @@ class Main
     efficiency = nil if efficiency == 0
     g = Grain.new( name, mass.to_f, unit, ppg, efficiency )
     @brew.add_grain( g )
+
+    self.recalculate_brew
     # Throw the brew back to the GUI to be displayed
     @gui.brew_update( @brew )
   end
@@ -58,6 +60,8 @@ class Main
     # and anything else was the user specifically changing it
     g = Grain.new( name, mass.to_f, unit, ppg.to_f, efficiency.to_f )
     @brew.update_grain( g )
+
+    self.recalculate_brew
     # Throw brew back to GUI
     @gui.brew_update( @brew )
   end
@@ -65,6 +69,8 @@ class Main
   def remove_grain( name )
     index = @brew.grains.index { |x| x.type == name }
     @brew.remove_grain_at( index )
+
+    self.recalculate_brew
     @gui.brew_update( @brew )
   end
 
@@ -77,6 +83,8 @@ class Main
     beta = nil if beta == 0
     h = Hops.new( name, alpha, beta, mass.to_f, unit )
     @brew.add_hops( h )
+
+    self.recalculate_brew
     # Throw the brew back to the GUI to be displayed
     @gui.brew_update( @brew )
   end
@@ -86,6 +94,8 @@ class Main
     # and anything else was the user specifically changing it
     h = Hops.new( name, alpha.to_f, beta.to_f, mass.to_f, unit )
     @brew.update_hops( h )
+
+    self.recalculate_brew
     # Throw brew back to GUI
     @gui.brew_update( @brew )
   end
@@ -93,6 +103,8 @@ class Main
   def remove_hops( name )
     index = @brew.hops.index { |x| x.type == name }
     @brew.remove_hops_at( index )
+
+    self.recalculate_brew
     @gui.brew_update( @brew )
   end
 
@@ -103,6 +115,8 @@ class Main
       attenuation = nil if attenuation == 0
       y = Yeast.new( name, attenuation )
       @brew.yeast = y
+
+      self.recalculate_brew
       @gui.brew_update( @brew )
     end
   end
@@ -110,11 +124,15 @@ class Main
   def update_yeast( name, attenuation )
     y = Yeast.new( name, attenuation.to_f )
     @brew.yeast = y
+
+    self.recalculate_brew
     @gui.brew_update( @brew )
   end
 
   def remove_yeast
     @brew.yeast = nil
+
+    self.recalculate_brew
     @gui.brew_update( @brew )
   end
 
@@ -129,7 +147,20 @@ class Main
     @brew.rate_boil_off = rate_boil_off.to_f
     @brew.percent_shrinkage = shrinkage.to_f
 
+    self.recalculate_brew
     @gui.brew_update( @brew )
+  end
+
+  def recalculate_brew
+    @brew.calc_volume_mash!
+    @brew.calc_volume_mash_loss!
+    @brew.calc_volume_boil_loss!
+    @brew.calc_volume_shrinkage_loss!
+    @brew.calc_volume_preboil!
+    @brew.calc_volume_sparge!
+    @brew.calc_gravity_original!
+    @brew.calc_gravity_final!
+    @brew.calc_percent_abv!
   end
 
 end

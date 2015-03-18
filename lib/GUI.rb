@@ -232,6 +232,10 @@ class BrewApp < Qt::MainWindow
 
     hbox.addLayout( left_grid )
 
+    right_grid = self.create_setting_recipe_grid
+
+    hbox.addLayout( right_grid )
+
     right_buttons = self.create_setting_button_vbox
 
     hbox.addLayout( right_buttons )
@@ -295,6 +299,42 @@ class BrewApp < Qt::MainWindow
     grid_settings.setColumnStretch( 4, 1 )
 
     return grid_settings
+  end
+
+  def create_setting_recipe_grid
+    @mash_volume = 0
+    @sparge_volume = 0
+    @preboil_volume = 0
+    @orig_gravity = 0
+    @final_gravity = 0
+    @abv = 0
+
+    grid_recipe = Qt::GridLayout.new
+
+    grid_recipe.setColumnStretch( 0, 1 )
+
+    @mash_volume_label = Qt::Label.new( "Mash volume: #{@mash_volume} gal", self )
+    grid_recipe.addWidget( @mash_volume_label, 0, 1 )
+
+    @sparge_volume_label = Qt::Label.new( "Sparge volume: #{@sparge_volume} gal", self )
+    grid_recipe.addWidget( @sparge_volume_label, 1, 1 )
+
+    @preboil_volume_label = Qt::Label.new( "Preboil volume: #{@preboil_volume} gal", self )
+    grid_recipe.addWidget( @preboil_volume_label, 2, 1 )
+
+    @og_label = Qt::Label.new( "Original gravity: #{@orig_gravity}", self )
+    grid_recipe.addWidget( @og_label, 3, 1 )
+
+    @fg_label = Qt::Label.new( "Final gravity: #{@final_gravity}", self )
+    grid_recipe.addWidget( @fg_label, 4, 1 )
+
+    @abv_label = Qt::Label.new( "ABV: #{@abv}", self )
+    grid_recipe.addWidget( @abv_label, 5, 1 )
+
+    grid_recipe.setRowStretch( 6, 1 )
+    grid_recipe.setColumnStretch( 3, 1 )
+
+    return grid_recipe
   end
 
   def create_setting_button_vbox
@@ -637,6 +677,28 @@ class BrewApp < Qt::MainWindow
   # Receive the updated brew data and update the GUI with it
   def brew_update b
     @display_brew = b
+
+    # Update misc brew values
+    @mash_volume = @display_brew.volume_mash.volume
+    @sparge_volume = @display_brew.volume_sparge.volume
+    @preboil_volume = @display_brew.volume_preboil.volume
+    @orig_gravity = @display_brew.gravity_original
+    @final_gravity = @display_brew.gravity_final
+    @abv = @display_brew.percent_abv
+
+    # Update brew recipe in the settings tab
+    mash_str = "Mash volume: %.3f gal" % [@mash_volume]
+    @mash_volume_label.setText( mash_str )
+    sparge_str = "Sparge volume: %.3f gal" % [@sparge_volume]
+    @sparge_volume_label.setText( sparge_str )
+    preboil_str = "Preboil volume: %.3f gal" % [@preboil_volume]
+    @preboil_volume_label.setText( preboil_str )
+    og_str = "Original gravity: %.3f" % [@orig_gravity]
+    @og_label.setText( og_str )
+    fg_str = "Final gravity: %.3f" % [@final_gravity]
+    @fg_label.setText( fg_str )
+    abv_str = "ABV: %.2f" % [@abv]
+    @abv_label.setText( abv_str )
 
     # Clear out the old grains
     while( @end_of_grains > 0 )

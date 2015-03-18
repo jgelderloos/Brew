@@ -255,7 +255,11 @@ class Brew
   end
   
   def calc_gravity_final
-    gravity = (( @gravity_original - 1 ) * (1 - (@yeast.percent_attenuation / 100.0 ))) + 1
+    if( @yeast != nil )
+      gravity = (( @gravity_original - 1 ) * (1 - (@yeast.percent_attenuation / 100.0 ))) + 1
+    else
+      gravity = 0
+    end
   end
   
   # calculating abv
